@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture Map - Printable Team Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+
+        input[type=range] {
+            @apply w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 relative z-40;
+        }
+        input[type=range]:disabled {
+            @apply opacity-50 cursor-not-allowed;
+        }
+
+        .signature-line { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 20; 
+        }
+        
+        .team-node {
+            transition: left 0.4s ease-out;
+        }
+
+        /* CRITICAL: Force browsers to print background colors and SVG colors */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            /* Make the SVG lines fully opaque for better print visibility */
+            .signature-line { opacity: 1 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 overflow-x-hidden" x-data="cultureApp(CULTURE_MAP_CONFIG)">
+
+    <div class="max-w-7xl mx-auto py-12 px-6 pb-40" x-cloak>
+        
+        <header class="mb-10 border-b border-slate-300 pb-8 relative z-30">
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase">The Culture Map</h1>
+                <p class="text-slate-500 font-medium mt-1">Team Assessment vs. Global Benchmarks</p>
+            </div>
+        </header>
+
+        <div class="hidden print:flex flex-wrap items-center gap-6 mb-10 bg-slate-100 p-4 rounded-xl border border-slate-200" x-show="isRevealMode && teamProfiles.length > 0">
+            <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">Team Roster:</h3>
+            <template x-for="p in teamProfiles" :key="p.id">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black text-white shadow-sm"
+                         :style="`background-color: ${p.color};`" x-text="p.initials"></div>
+                    <span class="text-sm font-bold text-slate-800" x-text="p.name"></span>
+                </div>
+            </template>
+        </div>
+
+        <div class="relative w-full" id="map-wrapper">
+            
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 0;" id="svg-container">
+                <path x-show="!isRevealMode" :d="activePathData" 
+                      fill="none" stroke="#4f46e5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" 
+                      class="signature-line opacity-60" />
+
+                <template x-for="teamLine in teamPathData" :key="teamLine.id">
+                    <path x-show="isRevealMode" :d="teamLine.path" 
+                          fill="none" :stroke="teamLine.color" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" 
+                          class="signature-line opacity-75" />
+                </template>
+            </svg>
+
+            <div class="grid lg:grid-cols-2 gap-x-16 gap-y-12 relative z-10">
+                <template x-for="(d, index) in dimensions" :key="index">
+                    <div class="contents group">
+                        
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center transition-all relative z-20">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shadow-sm" x-text="index + 1"></span>
+                                <h3 class="text-sm font-black uppercase tracking-widest text-slate-800" x-text="d.title"></h3>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-6 items-start">
+                                <div>
+                                    <h4 class="text-[9px] font-black text-slate-400 uppercase mb-1" x-text="d.leftLabel"></h4>
+                                    <p class="text-[11px] leading-relaxed text-slate-600 transition-all" x-text="showFullDescriptions ? d.leftFull : d.leftDesc"></p>
+                                </div>
+                                <div class="border-l border-slate-100 pl-4 h-full">
+                                    <h4 class="text-[9px] font-black text-slate-400 uppercase mb-1" x-text="d.rightLabel"></h4>
+                                    <p class="text-[11px] leading-relaxed text-slate-600 transition-all" x-text="showFullDescriptions ? d.rightFull : d.rightDesc"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative flex flex-col justify-end px-4 py-8 lg:py-0 dimension-row min-h-[140px]" :data-index="index">
+                            
+                            <div class="relative w-full h-16 mb-4" x-show="showCountries" x-transition.opacity>
+                                <template x-for="country in getSpacedCountries(index)" :key="country.name">
+                                    <div class="absolute flex flex-col items-center transition-all duration-700" :style="`left: ${country.pos}%; bottom: 0; transform: translateX(-50%);`">
+                                        <div class="bg-slate-100 border border-slate-300 text-slate-600 px-1.5 py-0.5 rounded text-[8px] font-bold shadow-sm whitespace-nowrap z-10"
+                                             :style="`margin-bottom: ${country.level * 16}px;`" x-text="country.name"></div>
+                                        <div class="w-px bg-slate-300 absolute bottom-0 -z-10" :style="`height: ${(country.level * 16) + 4}px;`"></div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="relative flex items-center w-full">
+                                <template x-for="p in teamProfiles" :key="p.id">
+                                    <div x-show="isRevealMode" 
+                                         class="absolute h-6 w-6 rounded-full border-[3px] border-white shadow-md z-50 team-node flex items-center justify-center"
+                                         :style="`background-color: ${p.color}; left: calc(8px + (100% - 16px) * (${p.values[index]} / 100)); transform: translateX(-50%);`"
+                                         :title="p.name">
+                                         <span class="text-[9px] text-white font-black" x-text="p.initials"></span>
+                                    </div>
+                                </template>
+
+                                <input type="range" min="0" max="100" x-model="d.value" @input="drawPath()" :disabled="isRevealMode" class="w-full">
+                            </div>
+
+                            <div class="flex justify-between mt-4">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter w-1/3 text-left leading-tight" x-text="d.leftLabel"></span>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter w-1/3 text-right leading-tight" x-text="d.rightLabel"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="fixed bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 w-[calc(100%-1rem)] md:w-[calc(100%-2rem)] max-w-5xl z-[100] bg-white/95 backdrop-blur-md border-2 border-indigo-200 rounded-2xl shadow-[0_-10px_40px_rgba(79,70,229,0.15)] print:hidden flex flex-col overflow-hidden">
+            
+            <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-3 bg-indigo-50 border-b border-indigo-100">
+                <div class="flex flex-wrap gap-2">
+                    <button @click="toggleDescriptions()" 
+                            :class="showFullDescriptions ? 'bg-indigo-200 text-indigo-800 border-indigo-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                            class="px-3 py-1 border rounded text-[10px] font-bold uppercase transition-colors shadow-sm">
+                        <span x-text="showFullDescriptions ? '● Full Descriptions' : '○ Full Descriptions'"></span>
+                    </button>
+                    <button @click="showCountries = !showCountries" 
+                            :class="showCountries ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                            class="px-3 py-1 border rounded text-[10px] font-bold uppercase transition-colors shadow-sm">
+                        <span x-text="showCountries ? '● Global Benchmarks' : '○ Global Benchmarks'"></span>
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <button @click="reset()" class="px-3 py-1 text-[10px] font-bold uppercase text-slate-500 hover:text-red-500 transition-colors">Reset Sliders</button>
+                    <button @click="window.print()" class="px-3 py-1 bg-slate-800 text-white rounded text-[10px] font-bold uppercase shadow hover:bg-black transition-colors">Export PDF</button>
+                </div>
+            </div>
+
+            <div class="p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <div class="flex items-center gap-3 w-full md:w-auto" x-show="!isRevealMode">
+                    <input type="text" x-model="currentName" placeholder="Enter your name..." 
+                           class="px-4 py-2.5 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold text-slate-700 w-full md:w-64 shadow-sm">
+                    <button @click="saveProfile()" 
+                            class="px-6 py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-lg shadow-lg hover:bg-indigo-700 transition-all hover:scale-105 whitespace-nowrap">
+                        Save Name, Pass to Next
+                    </button>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto justify-between md:justify-end" x-show="teamProfiles.length > 0">
+                    <div class="flex flex-wrap gap-2 justify-center md:justify-end">
+                        <template x-for="p in teamProfiles" :key="p.id">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-md cursor-pointer hover:scale-110 transition-transform"
+                                 :style="`background-color: ${p.color};`" x-text="p.initials" :title="p.name"></div>
+                        </template>
+                    </div>
+                    
+                    <button @click="toggleReveal()" 
+                            :class="isRevealMode ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-emerald-500 text-white hover:bg-emerald-600'"
+                            class="px-6 py-2.5 font-black text-sm rounded-lg shadow-lg hover:scale-105 transition-all whitespace-nowrap w-full md:w-auto">
+                        <span x-text="isRevealMode ? 'Resume Editing' : 'Reveal Team Map'"></span>
+                    </button>
+                    
+                    <button @click="resetTeam()" x-show="!isRevealMode" class="text-[10px] font-bold uppercase text-slate-400 hover:text-red-500 underline ml-2">Clear Team</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const CULTURE_MAP_CONFIG = {
+            benchmarkData: [
+                [ { name: "US", pos: 5, level: 2 }, { name: "Netherlands", pos: 15, level: 2 }, { name: "Finland", pos: 25, level: 2 }, { name: "Spain", pos: 50, level: 2 }, { name: "Italy", pos: 55, level: 2 }, { name: "Singapore", pos: 65, level: 2 }, { name: "Iran", pos: 75, level: 2 }, { name: "China", pos: 85, level: 2 }, { name: "Japan", pos: 95, level: 2 }, { name: "Australia", pos: 10, level: 1 }, { name: "Germany", pos: 20, level: 1 }, { name: "Denmark", pos: 30, level: 1 }, { name: "Poland", pos: 40, level: 1 }, { name: "Brazil", pos: 45, level: 1 }, { name: "Mexico", pos: 55, level: 1 }, { name: "France", pos: 60, level: 1 }, { name: "India", pos: 75, level: 1 }, { name: "Kenya", pos: 85, level: 1 }, { name: "Korea", pos: 90, level: 1 }, { name: "Canada", pos: 10, level: 0 }, { name: "UK", pos: 30, level: 0 }, { name: "Argentina", pos: 50, level: 0 }, { name: "Peru", pos: 60, level: 0 }, { name: "Russia", pos: 70, level: 0 }, { name: "Saudi Arabia", pos: 80, level: 0 }, { name: "Indonesia", pos: 95, level: 0 } ],
+                [ { name: "Russia", pos: 10, level: 2 }, { name: "France", pos: 20, level: 2 }, { name: "Italy", pos: 35, level: 2 }, { name: "US", pos: 50, level: 2 }, { name: "UK", pos: 55, level: 2 }, { name: "Brazil", pos: 60, level: 2 }, { name: "India", pos: 70, level: 2 }, { name: "Saudi Arabia", pos: 80, level: 2 }, { name: "Japan", pos: 95, level: 2 }, { name: "Israel", pos: 5, level: 1 }, { name: "Germany", pos: 15, level: 1 }, { name: "Norway", pos: 25, level: 1 }, { name: "Australia", pos: 35, level: 1 }, { name: "Canada", pos: 50, level: 1 }, { name: "Mexico", pos: 65, level: 1 }, { name: "China", pos: 75, level: 1 }, { name: "Korea", pos: 85, level: 1 }, { name: "Thailand", pos: 95, level: 1 }, { name: "Netherlands", pos: 10, level: 0 }, { name: "Denmark", pos: 25, level: 0 }, { name: "Spain", pos: 35, level: 0 }, { name: "Argentina", pos: 55, level: 0 }, { name: "Kenya", pos: 70, level: 0 }, { name: "Ghana", pos: 80, level: 0 }, { name: "Indonesia", pos: 95, level: 0 } ],
+                [ { name: "Italy", pos: 15, level: 1 }, { name: "Russia", pos: 25, level: 1 }, { name: "Germany", pos: 35, level: 1 }, { name: "Argentina", pos: 45, level: 1 }, { name: "Sweden", pos: 55, level: 1 }, { name: "Netherlands", pos: 65, level: 1 }, { name: "Australia", pos: 80, level: 1 }, { name: "France", pos: 10, level: 0 }, { name: "Spain", pos: 20, level: 0 }, { name: "Brazil", pos: 40, level: 0 }, { name: "Mexico", pos: 50, level: 0 }, { name: "Denmark", pos: 60, level: 0 }, { name: "UK", pos: 70, level: 0 }, { name: "Canada", pos: 85, level: 0 }, { name: "US", pos: 95, level: 0 } ],
+                [ { name: "Denmark", pos: 5, level: 2 }, { name: "Israel", pos: 15, level: 2 }, { name: "Canada", pos: 30, level: 2 }, { name: "US", pos: 40, level: 2 }, { name: "France", pos: 60, level: 2 }, { name: "Poland", pos: 70, level: 2 }, { name: "Saudi Arabia", pos: 80, level: 2 }, { name: "Japan", pos: 95, level: 2 }, { name: "Netherlands", pos: 10, level: 1 }, { name: "Finland", pos: 25, level: 1 }, { name: "UK", pos: 45, level: 1 }, { name: "Germany", pos: 50, level: 1 }, { name: "Italy", pos: 65, level: 1 }, { name: "Russia", pos: 75, level: 1 }, { name: "India", pos: 85, level: 1 }, { name: "Korea", pos: 95, level: 1 }, { name: "Sweden", pos: 5, level: 0 }, { name: "Australia", pos: 20, level: 0 }, { name: "Brazil", pos: 55, level: 0 }, { name: "Spain", pos: 60, level: 0 }, { name: "Mexico", pos: 70, level: 0 }, { name: "Peru", pos: 80, level: 0 }, { name: "China", pos: 90, level: 0 }, { name: "Nigeria", pos: 95, level: 0 } ],
+                [ { name: "Japan", pos: 10, level: 2 }, { name: "Sweden", pos: 20, level: 2 }, { name: "Netherlands", pos: 35, level: 2 }, { name: "US", pos: 55, level: 1 }, { name: "France", pos: 65, level: 1 }, { name: "Germany", pos: 40, level: 1 }, { name: "UK", pos: 50, level: 1 }, { name: "Brazil", pos: 60, level: 0 }, { name: "Italy", pos: 70, level: 0 }, { name: "Russia", pos: 80, level: 0 }, { name: "China", pos: 90, level: 0 }, { name: "India", pos: 85, level: 0 }, { name: "Nigeria", pos: 95, level: 0 } ],
+                [ { name: "US", pos: 5, level: 2 }, { name: "Denmark", pos: 15, level: 2 }, { name: "Germany", pos: 25, level: 2 }, { name: "UK", pos: 35, level: 2 }, { name: "Netherlands", pos: 45, level: 2 }, { name: "Australia", pos: 50, level: 2 }, { name: "Poland", pos: 45, level: 1 }, { name: "Spain", pos: 60, level: 1 }, { name: "Italy", pos: 70, level: 1 }, { name: "France", pos: 80, level: 1 }, { name: "Russia", pos: 90, level: 1 }, { name: "Brazil", pos: 60, level: 0 }, { name: "Turkey", pos: 70, level: 0 }, { name: "Mexico", pos: 80, level: 0 }, { name: "India", pos: 90, level: 0 }, { name: "China", pos: 95, level: 0 } ],
+                [ { name: "Israel", pos: 5, level: 2 }, { name: "France", pos: 15, level: 2 }, { name: "Germany", pos: 25, level: 2 }, { name: "Denmark", pos: 35, level: 2 }, { name: "Netherlands", pos: 45, level: 2 }, { name: "Australia", pos: 55, level: 2 }, { name: "Spain", pos: 65, level: 2 }, { name: "Russia", pos: 20, level: 1 }, { name: "Italy", pos: 30, level: 1 }, { name: "US", pos: 40, level: 1 }, { name: "UK", pos: 50, level: 1 }, { name: "Brazil", pos: 60, level: 0 }, { name: "Mexico", pos: 70, level: 0 }, { name: "Singapore", pos: 80, level: 0 }, { name: "Japan", pos: 90, level: 0 }, { name: "Thailand", pos: 95, level: 0 } ],
+                [ { name: "Germany", pos: 5, level: 2 }, { name: "Switzerland", pos: 15, level: 2 }, { name: "Japan", pos: 25, level: 2 }, { name: "Netherlands", pos: 35, level: 2 }, { name: "Sweden", pos: 45, level: 2 }, { name: "Austria", pos: 55, level: 2 }, { name: "UK", pos: 10, level: 1 }, { name: "US", pos: 20, level: 1 }, { name: "Denmark", pos: 30, level: 1 }, { name: "Poland", pos: 40, level: 1 }, { name: "Spain", pos: 60, level: 1 }, { name: "Italy", pos: 70, level: 1 }, { name: "Russia", pos: 60, level: 0 }, { name: "Brazil", pos: 70, level: 0 }, { name: "Turkey", pos: 80, level: 0 }, { name: "Mexico", pos: 90, level: 0 }, { name: "Peru", pos: 95, level: 0 } ]
+            ],
+            dimensions: [
+                { title: "Communicating", value: 50, leftLabel: "Low-Context", rightLabel: "High-Context", leftDesc: "Precise, simple and clear. Face value.", rightDesc: "Sophisticated, nuanced, layered. Between lines.", leftFull: "Good communication is precise, simple, and clear. Messages are expressed and understood at face value.", rightFull: "Good communication is sophisticated, nuanced, and layered. Messages are both spoken and read between the lines." },
+                { title: "Evaluating", value: 50, leftLabel: "Direct Negative", rightLabel: "Indirect Negative", leftDesc: "Frank, blunt, honest feedback.", rightDesc: "Subtle, diplomatic. Wrapped in positive.", leftFull: "Negative feedback is provided frankly, bluntly, honestly. Messages stand alone, not softened by positive ones.", rightFull: "Negative feedback is provided softly, subtly, diplomatically. Positive messages wrap negative ones." },
+                { title: "Persuading", value: 50, leftLabel: "Principles-First", rightLabel: "Applications-First", leftDesc: "Develop theory before fact. Why?", rightDesc: "Fact or bullets first. How?", leftFull: "Trained to first develop the theory or complex concept before presenting a fact, statement, or opinion.", rightFull: "Trained to begin with a fact, statement, or opinion and later add concepts to back up the conclusion." },
+                { title: "Leading", value: 50, leftLabel: "Egalitarian", rightLabel: "Hierarchical", leftDesc: "Flat structures. Boss as facilitator.", rightDesc: "Status is important. Boss as director.", leftFull: "The ideal distance between boss and subordinate is low. The best boss is a facilitator among equals.", rightFull: "The ideal distance between boss and subordinate is high. The best boss is a strong director." },
+                { title: "Deciding", value: 50, leftLabel: "Consensual", rightLabel: "Top-Down", leftDesc: "Group agreement, unanimous.", rightDesc: "Individual decisions, usually boss.", leftFull: "Decisions are made in groups through unanimous agreement.", rightFull: "Decisions are made by individuals (usually the boss)." },
+                { title: "Trusting", value: 50, leftLabel: "Task-Based", rightLabel: "Relationship-Based", leftDesc: "Trust through work and reliability.", rightDesc: "Trust through sharing personal time.", leftFull: "Trust is built through business-related activities. Work relationships are built and dropped easily.", rightFull: "Trust is built through sharing meals, evening drinks. Work relationships build up slowly." },
+                { title: "Disagreeing", value: 50, leftLabel: "Confrontational", rightLabel: "Avoids Confrontation", leftDesc: "Debate is positive and healthy.", rightDesc: "Confrontation harms group harmony.", leftFull: "Disagreement and debate are positive. Open confrontation will not negatively impact relationships.", rightFull: "Disagreement and debate are negative. Open confrontation will break group harmony." },
+                { title: "Scheduling", value: 50, leftLabel: "Linear-Time", rightLabel: "Flexible-Time", leftDesc: "Sequential. Deadlines over flexibility.", rightDesc: "Fluid tasks. Adaptability over promptness.", leftFull: "Project steps are approached sequentially. Focus is on deadlines and sticking to the schedule.", rightFull: "Project steps are fluid. Tasks change as opportunities arise. Adaptability is valued." }
+            ],
+            teamColors: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#ec4899', '#8b5cf6', '#14b8a6']
+        };
+
+        function cultureApp(config) {
+            return {
+                showCountries: false,
+                showFullDescriptions: false,
+                isRevealMode: false,
+                currentName: "",
+                teamProfiles: [],
+                activePathData: "",
+                teamPathData: [], 
+                benchmarkData: config.benchmarkData,
+                dimensions: JSON.parse(JSON.stringify(config.dimensions)),
+
+                init() {
+                    setTimeout(() => { this.drawPath(); }, 100);
+                    window.addEventListener('resize', () => { this.drawPath(); });
+                },
+
+                toggleDescriptions() {
+                    this.showFullDescriptions = !this.showFullDescriptions;
+                    setTimeout(() => { this.drawPath(); }, 50);
+                },
+
+                // Logic to create initials (e.g. "John Doe" -> "JD")
+                getInitials(name) {
+                    let parts = name.trim().split(/\s+/);
+                    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+                    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                },
+
+                saveProfile() {
+                    if (!this.currentName.trim()) { alert("Please enter a name first!"); return; }
+                    const colorIndex = this.teamProfiles.length % config.teamColors.length;
+                    
+                    this.teamProfiles.push({
+                        id: Date.now(), 
+                        name: this.currentName.trim(),
+                        initials: this.getInitials(this.currentName),
+                        color: config.teamColors[colorIndex], 
+                        values: this.dimensions.map(d => d.value)
+                    });
+
+                    this.currentName = "";
+                    this.dimensions.forEach(d => d.value = 50);
+                    this.drawPath();
+                },
+
+                toggleReveal() {
+                    this.isRevealMode = !this.isRevealMode;
+                    this.drawPath();
+                },
+
+                resetTeam() {
+                    if(confirm("Clear all team data?")) {
+                        this.teamProfiles = [];
+                        this.isRevealMode = false;
+                        this.dimensions.forEach(d => d.value = 50);
+                        this.drawPath();
+                    }
+                },
+
+                getSpacedCountries(index) {
+                    let items = JSON.parse(JSON.stringify(this.benchmarkData[index]));
+                    const levels = [0, 1, 2];
+                    const MIN_GAP = 9; 
+                    levels.forEach(level => {
+                        let levelItems = items.filter(item => item.level === level).sort((a, b) => a.pos - b.pos);
+                        for (let loop = 0; loop < 5; loop++) {
+                            for (let i = 0; i < levelItems.length - 1; i++) {
+                                let diff = levelItems[i+1].pos - levelItems[i].pos;
+                                if (diff < MIN_GAP) {
+                                    let push = (MIN_GAP - diff) / 2;
+                                    levelItems[i].pos -= push;
+                                    levelItems[i+1].pos += push;
+                                }
+                            }
+                            levelItems.forEach(item => { item.pos = Math.max(2, Math.min(98, item.pos)); });
+                        }
+                    });
+                    return items;
+                },
+
+                calculatePath(valuesArray) {
+                    const rows = document.querySelectorAll('.dimension-row');
+                    const svgContainer = document.getElementById('svg-container');
+                    if (!rows.length || !svgContainer) return "";
+                    
+                    const containerRect = svgContainer.getBoundingClientRect();
+                    let points = [];
+
+                    rows.forEach((row, i) => {
+                        const slider = row.querySelector('input');
+                        const val = Number(valuesArray[i]);
+                        const rect = slider.getBoundingClientRect();
+                        
+                        const min = Number(slider.min) || 0;
+                        const max = Number(slider.max) || 100;
+                        const travelPct = (val - min) / (max - min);
+                        
+                        const thumbWidth = 16; 
+                        const availableWidth = rect.width - thumbWidth;
+                        
+                        const x = (rect.left - containerRect.left) + (thumbWidth / 2) + (availableWidth * travelPct);
+                        const y = (rect.top - containerRect.top) + (rect.height / 2);
+                        
+                        points.push(`${x},${y}`);
+                    });
+                    
+                    return points.length > 0 ? `M ${points.join(' L ')}` : "";
+                },
+
+                drawPath() {
+                    this.activePathData = this.calculatePath(this.dimensions.map(d => d.value));
+                    this.teamPathData = this.teamProfiles.map(p => ({
+                        id: p.id, color: p.color, path: this.calculatePath(p.values)
+                    }));
+                },
+
+                reset() {
+                    this.dimensions.forEach((d, i) => { d.value = config.dimensions[i].value; });
+                    this.drawPath(); 
+                }
+            }
+        }
+    </script>
+</body>
+</html>
