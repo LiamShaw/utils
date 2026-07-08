@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Baas Verkley | Strategic SWOT & Horizon Matrix</title>
+    <title>Strategic SWOT & Horizon Matrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
@@ -31,7 +31,7 @@
       }
 
       body {
-        background-color: #0f172a; /* Slate 900 for a softer, premium dark workspace */
+        background-color: #0f172a;
       }
 
       /* Clean Tech-Grid Canvas Grid Overlay */
@@ -134,10 +134,11 @@
             </svg>
           </div>
           <div class="h-5 w-px bg-slate-800 hidden sm:block"></div>
+          <!-- Clean fixed tracking heading row -->
           <span
-            class="text-xs font-bold tracking-wider text-slate-400 hidden sm:block"
+            class="text-xs font-bold tracking-wider text-slate-200 hidden sm:block uppercase"
           >
-            Strategic SWOT & Horizon Matri
+            Strategic SWOT & Horizon Matrix
           </span>
         </div>
 
@@ -178,11 +179,42 @@
       </div>
     </header>
 
+    <!-- PROMINENT LIVE BROWSER-EDITABLE STRATEGIC SCOPE BANNER -->
+    <div class="max-w-7xl mx-auto px-4 lg:px-8 pt-6">
+      <div
+        class="bg-slate-800/40 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md"
+      >
+        <div class="w-full md:max-w-xl lg:max-w-2xl">
+          <label
+            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1"
+          >
+            Active Strategic Scope (Click to Edit)
+          </label>
+          <input
+            type="text"
+            id="strategic-scope-input"
+            oninput="window.updateStrategicScope(this.value)"
+            class="bg-transparent text-lg font-extrabold text-white focus:text-[#6ea0dd] focus:outline-none w-full border-b border-transparent hover:border-slate-700 focus:border-[#6ea0dd] transition-colors py-0.5 rounded-none"
+            value=""
+          />
+        </div>
+        <div class="text-left md:text-right hidden sm:block shrink-0">
+          <span
+            class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block"
+            >Framework Pipeline</span
+          >
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wide"
+            >SWOT + McKinsey 3-Horizons</span
+          >
+        </div>
+      </div>
+    </div>
+
     <!-- MAIN INTERFACE VIEWPORT -->
     <main
       class="max-w-7xl mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8"
     >
-      <!-- CORE SWOT ENTITY GRID CARDS -->
+      <!-- SWOT ENTITY CARDS MODULE -->
       <div class="lg:col-span-7 space-y-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- STRENGTHS -->
@@ -306,10 +338,10 @@
           </div>
         </div>
 
-        <!-- REFINED INTERACTIVE LINK CANVAS VISUALIZER -->
+        <!-- SPATIAL CORE MAPPING VIEWPORT -->
         <div
           id="mindmap-viewport"
-          class="bg-slate-800/90 p-6 rounded-xl border border-slate-800 shadow-xl min-h-[440px] flex flex-col relative bv-grid-canvas"
+          class="bg-slate-800/90 p-6 rounded-xl border border-slate-800 shadow-xl min-h-[460px] flex flex-col relative bv-grid-canvas"
         >
           <div
             class="flex justify-between items-center border-b border-slate-700/60 pb-3 mb-6"
@@ -330,14 +362,34 @@
               Clear Focus ×
             </span>
           </div>
+
           <div
             id="mindmap-canvas"
             class="flex-1 flex flex-col justify-between relative min-h-[340px]"
           ></div>
+
+          <!-- DYNAMIC STRATEGIC DESCRIPTION EDITOR PANEL -->
+          <div
+            id="description-editor-panel"
+            class="mt-6 pt-4 border-t border-slate-700/60 hidden"
+          >
+            <label
+              class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5"
+            >
+              Active Focus Element Strategy Notes & Project Descriptions
+            </label>
+            <textarea
+              id="node-description-field"
+              oninput="window.updateSelectedDescription(this.value)"
+              rows="3"
+              class="w-full bg-slate-950 text-slate-300 text-xs border border-slate-700 rounded-lg p-2.5 focus:outline-none focus:border-slate-500 font-medium resize-y"
+              placeholder="Add modular metrics, action vectors, or capability parameters for this focal node..."
+            ></textarea>
+          </div>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: THREE HORIZONS PERFORMANCE PIPELINE CONTAINER -->
+      <!-- RIGHT COLUMN: THREE HORIZONS PERFORMANCE PIPELINE -->
       <div class="lg:col-span-5 space-y-8">
         <div
           class="bg-slate-800/70 p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col"
@@ -382,7 +434,7 @@
             </div>
           </div>
 
-          <!-- HORIZONS ROUTINES STYLED PIPELINES -->
+          <!-- HORIZONS STYLED PIPELINES -->
           <div class="space-y-4">
             <!-- HORIZON 1 CONTAINER -->
             <div
@@ -433,63 +485,168 @@
       </div>
     </main>
 
-    <!-- PROCESSING SCRIPTS AND ARCHITECTURAL PERSISTENCE ENGINGE -->
+    <!-- PROCESSING SCRIPTS AND ARCHITECTURAL PERSISTENCE ENGINE -->
     <script>
       // =========================================================================
-      // SECTION I: ARCHITECTURAL DATA STRUCT LAYOUT
+      // SECTION I: EMBEDDED REAL-WORLD DATASETS & APPLICATION STATE
       // =========================================================================
 
       window.state = {
+        // Live Browser-Editable Strategy Focus Title Parameter
+        strategicScope:
+          "Vakschool Monetization & External Certification Academy",
+
         nodes: [
           {
             id: "n1",
             type: "SWOT",
             subtype: "Strength",
-            label: "High Engineering Adaptability",
+            label: "Sunk-Cost Trade School Infrastructure",
+            description:
+              "Physical facilities and advanced technical training curriculum already baseline-funded via core internal onboarding operations.",
           },
           {
             id: "n2",
             type: "SWOT",
-            subtype: "Weakness",
-            label: "Limited Budgetary Fluidity",
+            subtype: "Strength",
+            label: "Captive Shell of 500 Subcontractors",
+            description:
+              "Immediate high-volume B2B consumer pipeline. Uncertified ZZP workers run through programs with costs deducted straight from their invoices.",
           },
           {
             id: "n3",
             type: "SWOT",
-            subtype: "Opportunity",
-            label: "Expanding European Cleantech Mandates",
+            subtype: "Strength",
+            label: "Senior Mechanics ('Bazen') Network",
+            description:
+              "Elite in-house technicians can be rotated to serve as master field instructors, maintaining premium practical trade school rigor.",
           },
           {
             id: "n4",
             type: "SWOT",
-            subtype: "Threat",
-            label: "Aggressive Pricing Vectors from Legacy Rivals",
+            subtype: "Weakness",
+            label: "Seat Booking Competency Gaps",
+            description:
+              "Internal sales forces are structured to trade high-value long-term engineering projects, not transactional educational bookings.",
           },
           {
             id: "n5",
-            type: "Project",
-            horizon: "H1",
-            label: "Project Alpha: Compliance Pipeline Buildout",
+            type: "SWOT",
+            subtype: "Weakness",
+            label: "Division Margin Compression (7%-9%)",
+            description:
+              "Historical electrical utility segments track narrow margins, limiting available immediate initial capital fluidity for expansions.",
           },
           {
             id: "n6",
-            type: "Project",
-            horizon: "H2",
-            label: "Project Beta: Next-Gen Core Platform R&D",
+            type: "SWOT",
+            subtype: "Weakness",
+            label: "Internal Cohort Capacity Constraints",
+            description:
+              "High risk that external student volumes accidentally displace or slow down Baas Verkley's core native apprentice pipelines.",
           },
           {
             id: "n7",
+            type: "SWOT",
+            subtype: "Opportunity",
+            label: "Strict Real Estate Insurance Mandates",
+            description:
+              "Insurance providers strictly enforce regular SCIOS Scope 10/12 certifications to mitigate electrical fire liabilities.",
+          },
+          {
+            id: "n8",
+            type: "SWOT",
+            subtype: "Opportunity",
+            label: "National Grid Congestion Bottlenecks",
+            description:
+              "Market parameters are entirely constrained by certified hands rather than available project financing or grid demand.",
+          },
+          {
+            id: "n9",
+            type: "SWOT",
+            subtype: "Opportunity",
+            label: "Mandatory Periodic Recurrent Refresher Tests",
+            description:
+              "Certifications systematically expire. Refresher tracks build a highly predictable, high-margin baseline corporate annuity stream.",
+          },
+          {
+            id: "n10",
+            type: "SWOT",
+            subtype: "Threat",
+            label: "Regional Director Delivery Resistance",
+            description:
+              "Field executives prioritize direct field mechanics and billing capacity over moving expert staff to central instruction setups.",
+          },
+          {
+            id: "n11",
+            type: "SWOT",
+            subtype: "Threat",
+            label: "Entrenched Technical Training Rivals",
+            description:
+              "Established commercial education providers like ROVC or Van Empel possess defensive market positions and deep industry trust.",
+          },
+          {
+            id: "n12",
+            type: "SWOT",
+            subtype: "Threat",
+            label: "Exam Board Licensing Markups",
+            description:
+              "Independent testing boards capture a high portion of final seat costs unless the facility is certified as an examination space.",
+          },
+          {
+            id: "n13",
+            type: "Project",
+            horizon: "H1",
+            label: "Project Alpha: B2B Booking Engine & Empty-Chair Cohorts",
+            description:
+              "Launch targeted marketing and dynamic reservation loops to fill extra vacancies inside ongoing internal training programs under three months.",
+          },
+          {
+            id: "n14",
+            type: "Project",
+            horizon: "H1",
+            label: "Project Beta: Flex Worker NEN 3140 Compliance Mandate",
+            description:
+              "Roll out mandatory 2-day low-voltage safety training to our current flex worker pool to solidify supply chain delivery quality.",
+          },
+          {
+            id: "n15",
+            type: "Project",
+            horizon: "H2",
+            label: "Project Gamma: Premium SCIOS Scope 10/12 Inspection Launch",
+            description:
+              "Introduce highly specialized fire risk and solar photovoltaic training systems charging up to 2000 euros per student seat.",
+          },
+          {
+            id: "n16",
+            type: "Project",
+            horizon: "H2",
+            label: "Project Delta: Field Day-Rate Instructor Incentives",
+            description:
+              "Establish dedicated premium training day-rate allowances to offset regional director friction and mobilize elite mechanics.",
+          },
+          {
+            id: "n17",
             type: "Project",
             horizon: "H3",
-            label: "Project Gamma: Sub-Saharan Market Discovery",
+            label:
+              "Project Epsilon: Certified In-House Examination Hub Integration",
+            description:
+              "Obtain direct authorization as an independent exam location with SCIOS/IBEX to retain secondary testing and markup revenues.",
           },
         ],
         edges: [
-          { id: "e1", sourceId: "n5", targetId: "n2" },
-          { id: "e2", sourceId: "n5", targetId: "n3" },
-          { id: "e3", sourceId: "n6", targetId: "n1" },
+          { id: "e1", sourceId: "n13", targetId: "n4" },
+          { id: "e2", sourceId: "n14", targetId: "n2" },
+          { id: "e3", sourceId: "n14", targetId: "n8" },
+          { id: "e4", sourceId: "n15", targetId: "n7" },
+          { id: "e5", sourceId: "n15", targetId: "n6" },
+          { id: "e6", sourceId: "n16", targetId: "n10" },
+          { id: "e7", sourceId: "n16", targetId: "n3" },
+          { id: "e8", sourceId: "n17", targetId: "n12" },
+          { id: "e9", sourceId: "n17", targetId: "n9" },
         ],
-        selectedNodeId: "n5",
+        selectedNodeId: "n13",
       };
 
       window.verbTaxonomy = {
@@ -536,8 +693,12 @@
       };
 
       // =========================================================================
-      // SECTION II: PORT DATA SERIALIZER COMMAND LINES
+      // SECTION II: INTERCHANGE SERIALIZER REFACTOR LOOPS
       // =========================================================================
+
+      window.updateStrategicScope = function (val) {
+        window.state.strategicScope = val.trim();
+      };
 
       window.toggleAndPopulateDataDrawer = function () {
         const drawerEl = document.getElementById("data-portal-drawer");
@@ -548,8 +709,13 @@
 
         drawerEl.classList.toggle("hidden");
         if (!drawerEl.classList.contains("hidden")) {
+          // Bundling scope title directly into data loop outputs
           targetTextField.value = JSON.stringify(
-            { nodes: window.state.nodes, edges: window.state.edges },
+            {
+              strategicScope: window.state.strategicScope,
+              nodes: window.state.nodes,
+              edges: window.state.edges,
+            },
             null,
             2,
           );
@@ -597,7 +763,7 @@
       };
 
       // =========================================================================
-      // SECTION III: INTERFACE ENGINE COMPILING GENERATION
+      // SECTION III: GENERATION LAYOUT BUILDERS
       // =========================================================================
 
       window.renderInterfaceListsOnly = function () {
@@ -610,6 +776,10 @@
         horizonBuckets.forEach(
           (h) => (document.getElementById(`list-${h}`).innerHTML = ""),
         );
+
+        // Keep input value matched up with active variable engine arrays
+        document.getElementById("strategic-scope-input").value =
+          window.state.strategicScope;
 
         window.state.nodes.forEach((node) => {
           let domContainer = null;
@@ -648,18 +818,17 @@
                  ondragover="window.handleCardDragOver(event, '${node.id}')"
                  ondragleave="window.handleCardDragLeave(event, '${node.id}')"
                  ondrop="window.handleCardDrop(event, '${node.id}')"
-                 class="p-3 bg-slate-900 border border-slate-800 rounded-lg text-xs flex justify-between items-center group cursor-pointer transition relative select-none ${colorAccentBorder} ${isSelected ? "ring-2 ring-slate-400 bg-slate-800 shadow-md shadow-black/20" : "hover:bg-slate-850"}">
-                <div class="flex items-center gap-3 w-full pr-6 pointer-events-none">
-                    <span class="text-slate-600 group-hover:text-slate-400 font-bold tracking-tight handle-grab-trigger cursor-grab pointer-events-auto select-none text-sm">⋮⋮</span>
-                    <input type="text" id="input-field-el-${node.id}"
-                           value="${node.label.replace(/"/g, "&quot;")}" 
-                           disabled
-                           onblur="window.disableAndCommitInlineEditing('${node.id}', this.value)"
-                           onchange="window.disableAndCommitInlineEditing('${node.id}', this.value)"
-                           onclick="event.stopPropagation()"
-                           class="bg-transparent text-slate-200 focus:outline-none focus:bg-slate-950 rounded px-1 py-0.5 w-full font-semibold pointer-events-none cursor-default focus:cursor-text truncate focus:overflow-visible focus:whitespace-normal">
+                 class="p-3 bg-slate-900 border border-slate-800 rounded-lg text-xs flex justify-between items-start group cursor-pointer transition relative select-none ${colorAccentBorder} ${isSelected ? "ring-2 ring-slate-400 bg-slate-800 shadow-md shadow-black/20" : "hover:bg-slate-850"}">
+                <div class="flex items-start gap-2.5 w-full pr-6 pointer-events-none">
+                    <span class="text-slate-600 group-hover:text-slate-400 font-bold tracking-tight handle-grab-trigger cursor-grab pointer-events-auto select-none text-sm pt-0.5">⋮⋮</span>
+                    <textarea id="input-field-el-${node.id}"
+                              rows="2"
+                              disabled
+                              onblur="window.disableAndCommitInlineEditing('${node.id}', this.value)"
+                              onclick="event.stopPropagation()"
+                              class="bg-transparent text-slate-200 focus:outline-none focus:bg-slate-950 rounded px-1 py-0.5 w-full font-semibold pointer-events-none cursor-default focus:cursor-text resize-none whitespace-normal break-words leading-normal overflow-hidden">${node.label.replace(/"/g, "&quot;")}</textarea>
                 </div>
-                <button onclick="event.stopPropagation(); window.deleteNodeEntity('${node.id}')" class="text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition text-md font-bold absolute right-2 pointer-events-auto">×</button>
+                <button onclick="event.stopPropagation(); window.deleteNodeEntity('${node.id}')" class="text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition text-md font-bold absolute right-2 top-2 pointer-events-auto">×</button>
             </div>
           `;
           domContainer.insertAdjacentHTML("beforeend", cardMarkupHtml);
@@ -681,13 +850,30 @@
       window.disableAndCommitInlineEditing = function (id, valueStr) {
         const targetNode = window.state.nodes.find((n) => n.id === id);
         if (targetNode) {
-          targetNode.label = valueStr.trim() || "Unnamed Parameter Asset";
+          targetNode.label = valueStr.trim() || "Unnamed Strategic Parameter";
         }
         window.renderAll();
       };
 
+      window.updateSelectedDescription = function (valueStr) {
+        if (!window.state.selectedNodeId) return;
+        const targetNode = window.state.nodes.find(
+          (n) => n.id === window.state.selectedNodeId,
+        );
+        if (targetNode) {
+          targetNode.description = valueStr;
+          const centerDescLabel = document.getElementById(
+            "center-node-description-label",
+          );
+          if (centerDescLabel) {
+            centerDescLabel.textContent =
+              valueStr || "No granular description notes tracked yet.";
+          }
+        }
+      };
+
       // =========================================================================
-      // SECTION IV: DRAG INTERACTIVE LINK HANDLER ROUTINES
+      // SECTION IV: DRAG MAPPING LOOPS DISPATCH HANDLERS
       // =========================================================================
 
       window.handleCardDragStart = function (event, nodeId) {
@@ -739,20 +925,23 @@
       };
 
       // =========================================================================
-      // SECTION V: GRAPH MATRIX VIEWPORT CANVAS GENERATOR BUILDERS
+      // SECTION V: HARMONIZED DYNAMIC CANVAS GRAPH ROUTINES
       // =========================================================================
 
       window.renderSpatialMindMapCanvas = function () {
         const canvas = document.getElementById("mindmap-canvas");
         const clearBtn = document.getElementById("clear-focus-trigger");
+        const descPanel = document.getElementById("description-editor-panel");
+        const descField = document.getElementById("node-description-field");
 
         if (!window.state.selectedNodeId) {
           canvas.innerHTML = `
             <div class="text-xs text-slate-400 font-semibold tracking-wide text-center max-w-xs m-auto leading-relaxed p-4 rounded-lg border border-slate-700 bg-slate-900/60">
-              Select an item or Drag parameters directly over each other to compute architectural links.
+              Select an item or Drag parameters directly over each other to compute strategic links.
             </div>
           `;
           clearBtn.classList.add("hidden");
+          descPanel.classList.add("hidden");
           return;
         }
 
@@ -761,6 +950,9 @@
           (n) => n.id === window.state.selectedNodeId,
         );
         if (!focusNode) return;
+
+        descPanel.classList.remove("hidden");
+        descField.value = focusNode.description || "";
 
         const links = {
           strengths: [],
@@ -811,25 +1003,32 @@
           }
         });
 
-        // Focal point contrast color mappings (Clear backgrounds with crisp matching text rules)
+        // REFINED: Balanced dark framework centerpiece design (Inherits horizon color accents cleanly)
         let centerStyleClasses =
           "bg-slate-900 border-slate-700 text-slate-100 ring-4 ring-slate-700/30";
         if (focusNode.type === "SWOT") {
           if (focusNode.subtype === "Strength")
             centerStyleClasses =
-              "bg-slate-900 border-2 border-[#018945] text-slate-100 ring-4 ring-[#018945]/20";
+              "bg-slate-900/95 border-2 border-[#018945] text-slate-100 ring-4 ring-[#018945]/20";
           if (focusNode.subtype === "Weakness")
             centerStyleClasses =
-              "bg-slate-900 border-2 border-[#e6aaa0] text-slate-100 ring-4 ring-[#e6aaa0]/20";
+              "bg-slate-900/95 border-2 border-[#e6aaa0] text-slate-100 ring-4 ring-[#e6aaa0]/20";
           if (focusNode.subtype === "Opportunity")
             centerStyleClasses =
-              "bg-slate-900 border-2 border-[#6ea0dd] text-slate-100 ring-4 ring-[#6ea0dd]/20";
+              "bg-slate-900/95 border-2 border-[#6ea0dd] text-slate-100 ring-4 ring-[#6ea0dd]/20";
           if (focusNode.subtype === "Threat")
             centerStyleClasses =
-              "bg-slate-900 border-2 border-[#e14b28] text-slate-100 ring-4 ring-[#e14b28]/20";
+              "bg-slate-900/95 border-2 border-[#e14b28] text-slate-100 ring-4 ring-[#e14b28]/20";
         } else if (focusNode.type === "Project") {
-          centerStyleClasses =
-            "bg-slate-100 border-2 border-white text-slate-900 ring-4 ring-white/20 shadow-xl";
+          if (focusNode.horizon === "H1")
+            centerStyleClasses =
+              "bg-slate-900/95 border-2 border-[#f0aa00] text-slate-100 ring-4 ring-[#f0aa00]/20";
+          if (focusNode.horizon === "H2")
+            centerStyleClasses =
+              "bg-slate-900/95 border-2 border-[#6ea0dd] text-slate-100 ring-4 ring-[#6ea0dd]/20";
+          if (focusNode.horizon === "H3")
+            centerStyleClasses =
+              "bg-slate-900/95 border-2 border-[#018945] text-slate-100 ring-4 ring-[#018945]/20";
         }
 
         const createNodeMarkupCard = (b) => `
@@ -837,7 +1036,7 @@
               <div class="text-[9px] uppercase tracking-wide text-slate-400 font-bold mb-1 block">
                   ${b.verb}
               </div>
-              <div class="text-slate-200 font-semibold leading-tight line-clamp-2">${b.node.label}</div>
+              <div class="text-slate-200 font-semibold leading-tight">${b.node.label}</div>
               <button onclick="window.removeEdgeRelationship('${b.edgeId}')" class="absolute -top-1.5 -right-1.5 bg-slate-800 text-slate-400 hover:text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition border border-slate-600 font-bold text-xs shadow-md">×</button>
           </div>
         `;
@@ -852,9 +1051,10 @@
                     ${links.opportunities.length ? links.opportunities.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">No links</span>'}
                 </div>
                 <div class="flex justify-center px-2">
-                    <div class="p-4 rounded-xl text-center max-w-full ${centerStyleClasses}">
+                    <div class="p-4 rounded-xl text-center max-w-full shadow-lg ${centerStyleClasses}">
                         <div class="text-[9px] font-bold uppercase tracking-wider opacity-60 mb-2">Focal Initiative [${focusNode.horizon}]</div>
-                        <div class="leading-snug font-bold text-sm">${focusNode.label}</div>
+                        <div class="leading-snug font-bold text-sm mb-2">${focusNode.label}</div>
+                        <p id="center-node-description-label" class="text-[10px] text-slate-400 font-medium leading-relaxed max-w-[170px] text-center mx-auto border-t border-slate-800 pt-1.5">${focusNode.description || "No strategy notes assigned."}</p>
                     </div>
                 </div>
                 <div class="flex flex-col gap-4 items-start justify-center pl-4 border-l border-dashed border-slate-700 min-h-[240px]">
@@ -875,9 +1075,10 @@
                     ${links.opportunities.length ? links.opportunities.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">None</span>'}
                 </div>
                 <div class="flex justify-center px-2">
-                    <div class="p-4 rounded-xl text-center max-w-full ${centerStyleClasses}">
+                    <div class="p-4 rounded-xl text-center max-w-full shadow-lg ${centerStyleClasses}">
                         <div class="text-[9px] font-bold uppercase tracking-wider opacity-60 mb-2">Focal SWOT [${focusNode.subtype.toUpperCase()}]</div>
-                        <div class="leading-snug font-bold text-sm">${focusNode.label}</div>
+                        <div class="leading-snug font-bold text-sm mb-2">${focusNode.label}</div>
+                        <p id="center-node-description-label" class="text-[10px] text-slate-400 font-medium leading-relaxed max-w-[170px] text-center mx-auto border-t border-slate-800 pt-1.5">${focusNode.description || "No strategy notes assigned."}</p>
                     </div>
                 </div>
                 <div class="flex flex-col gap-3 items-start justify-center pl-4 border-l border-dashed border-slate-700">
@@ -920,6 +1121,7 @@
           type: "SWOT",
           subtype: subtype,
           label: f.value.trim(),
+          description: "",
         });
         f.value = "";
         window.state.selectedNodeId = newId;
@@ -937,6 +1139,7 @@
           type: "Project",
           horizon: hSelect.value,
           label: f.value.trim(),
+          description: "",
         });
         f.value = "";
         window.state.selectedNodeId = newId;
@@ -967,6 +1170,9 @@
             Array.isArray(payload.nodes) &&
             Array.isArray(payload.edges)
           ) {
+            // Unpack scope parameter safely if present inside JSON inputs
+            window.state.strategicScope =
+              payload.strategicScope || "Unnamed Strategic Framework Scope";
             window.state.nodes = payload.nodes;
             window.state.edges = payload.edges;
             window.state.selectedNodeId = payload.nodes.length
@@ -977,15 +1183,15 @@
               .getElementById("data-portal-drawer")
               .classList.add("hidden");
           } else {
-            alert("Matrix Configuration Error: Missing core node layout maps.");
+            alert("Matrix Configuration Error: Missing node map files.");
           }
         } catch (err) {
-          alert("Parsing Aborted: Recheck plain JSON syntax layout patterns.");
+          alert("Parsing Aborted: Check internal syntax patterns.");
         }
       };
 
       // =========================================================================
-      // SECTION VI: CONCURRENT DRAG REORDERING HOOKS
+      // SECTION VI: LIFECYCLE DEPLOYMENT HOOKS
       // =========================================================================
       document.addEventListener("DOMContentLoaded", () => {
         window.renderAll();
