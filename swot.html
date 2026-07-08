@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Baas Verkley | Strategic SWOT & Horizon Matrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+      :root {
+        --bv-green: #018945;
+        --bv-blue: #6ea0dd;
+        --bv-yellow: #f0aa00;
+        --bv-rose: #e6aaa0;
+        --bv-red: #e14b28;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--bv-green);
+      }
+
+      body {
+        background-color: #0f172a; /* Slate 900 for a softer, premium dark workspace */
+      }
+
+      /* Clean Tech-Grid Canvas Grid Overlay */
+      .bv-grid-canvas {
+        background-size: 24px 24px;
+        background-image:
+          linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.015) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.015) 1px,
+            transparent 1px
+          );
+      }
+
+      /* Snappy Active Drop Indication */
+      .drop-target-hover {
+        border-color: #ffffff !important;
+        background-color: rgba(1, 137, 69, 0.15) !important;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body class="text-slate-100 min-h-screen antialiased font-sans">
+    <!-- HEADER BAR -->
+    <header
+      class="bg-slate-900/90 backdrop-blur border-b border-slate-800 p-4 sticky top-0 z-50 shadow-md"
+    >
+      <div
+        class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 relative"
+      >
+        <div class="flex items-center gap-4">
+          <div class="text-white shrink-0">
+            <!-- Baas Verkley SVG Logo Vector -->
+            <svg
+              width="144"
+              height="22"
+              viewBox="0 0 144 22"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clip-path="url(#clip0_6210_891)">
+                <path
+                  d="M138.852 14.7737L142.307 4.55518H143.998L137.984 21.9999H133.117V20.5975H136.922L138.029 17.1128L133.59 4.55518H135.352L138.761 14.7737H138.857H138.852Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M11.1097 12.2151C11.1097 15.6623 9.41814 17.1129 6.33972 17.1129H0V0.369385H6.3448C9.04731 0.369385 10.7592 1.47741 10.7592 4.43216C10.7592 6.32705 9.84485 7.78301 8.3412 8.37182C10.0582 8.78934 11.1148 10.1918 11.1148 12.2151H11.1097ZM1.64589 1.96987V7.6599H6.90867C8.19896 7.6599 9.00159 6.87304 9.00159 5.64189V3.89153C9.00159 2.66038 8.22436 1.96987 6.90867 1.96987H1.64589ZM9.3521 11.1767C9.3521 9.94554 8.38692 9.25503 7.16774 9.25503H1.64589V15.5071H7.02551C8.38692 15.5071 9.3521 14.7416 9.3521 13.4409V11.1767Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M23.1388 11.2784L20.3195 2.29104H20.223L17.3579 11.2784L16.8906 12.7558L15.4834 17.1129H13.7461L19.2629 0.369385H21.2593L26.7811 17.1129H25.0184L23.6062 12.7558L23.1388 11.2784Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M46.3222 4.40535C46.3222 6.42336 47.45 6.81946 49.1873 7.33333L51.8441 8.12019C54.6177 8.93382 55.8826 10.1864 55.8826 12.7022C55.8826 15.6569 53.4646 17.4769 50.1728 17.4769C46.881 17.4769 44.5595 15.8282 44.1836 12.2311H45.8295C46.0632 14.7416 47.7802 15.9246 50.1271 15.9246C52.474 15.9246 54.2367 14.7684 54.2367 12.7504C54.2367 10.7324 53.1801 10.3148 51.4885 9.82238L48.3186 8.91241C45.7584 8.17372 44.6763 6.74453 44.6763 4.40535C44.6763 1.89489 46.6473 0 49.9645 0C53.0175 0 55.2019 1.67543 55.4864 4.92457H53.8405C53.6525 2.46229 51.8898 1.55231 49.9645 1.55231C47.7548 1.55231 46.3222 2.56399 46.3222 4.41071V4.40535Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M75.9459 15.1913H76.0424L80.4822 0.369385H82.2196L77.0533 17.1129H74.9858L69.8398 0.369385H71.6026L75.9459 15.1913Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M93.2573 13.2481C92.9779 15.9298 90.9104 17.4072 88.4873 17.4072C85.0787 17.4072 83.5547 14.6719 83.5547 10.834C83.5547 6.99602 85.2209 4.26074 88.467 4.26074C91.713 4.26074 93.3741 7.06561 93.3741 10.2666V11.3264H85.2006V12.6807C85.2006 14.7255 86.8211 16.0048 88.5127 16.0048C90.2043 16.0048 91.52 15.1697 91.7333 13.2481H93.2624H93.2573ZM91.7333 8.98726C91.7333 6.92108 90.2297 5.66318 88.467 5.66318C86.7042 5.66318 85.2006 6.92108 85.2006 8.98726V9.924H91.7333V8.98726Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M96.8281 4.55518H102.116V5.95761H98.3572V17.1128H96.8281V4.55518Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M106.388 17.1129H104.859V0.369385H106.388V17.1129ZM106.434 10.0954L111.321 4.55527H113.317L108.268 10.1222L113.739 17.1129H111.905L106.434 10.0954Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M116.512 17.1129V0.369385H118.041V17.1129H116.512Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M131.312 13.2481C131.033 15.9298 128.965 17.4072 126.542 17.4072C123.133 17.4072 121.609 14.6719 121.609 10.834C121.609 6.99602 123.276 4.26074 126.522 4.26074C129.768 4.26074 131.429 7.06561 131.429 10.2666V11.3264H123.255V12.6807C123.255 14.7255 124.876 16.0048 126.567 16.0048C128.259 16.0048 129.575 15.1697 129.788 13.2481H131.317H131.312ZM129.788 8.98726C129.788 6.92108 128.284 5.66318 126.522 5.66318C124.759 5.66318 123.255 6.92108 123.255 8.98726V9.924H129.788V8.98726Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M77.052 20.5977H0V22.0001H77.052V20.5977Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M38.3627 11.2784L35.5433 2.29104H35.4519L32.5868 11.2784L32.1144 12.7558L30.7073 17.1129H28.9648L34.4867 0.369385H36.4831L42.005 17.1129H40.2422L38.8351 12.7558L38.3627 11.2784Z"
+                  fill="#ffffff"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_6210_891">
+                  <rect width="144" height="22" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <div class="h-5 w-px bg-slate-800 hidden sm:block"></div>
+          <span
+            class="text-xs font-bold tracking-wider text-slate-400 hidden sm:block"
+          >
+            Strategic SWOT & Horizon Matri
+          </span>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button
+            onclick="window.toggleAndPopulateDataDrawer()"
+            class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-4 py-2 text-xs rounded-md transition shadow-sm"
+          >
+            Data Portal (JSON) ⚙
+          </button>
+        </div>
+
+        <!-- JSON Interchange Panel Drawer Component -->
+        <div
+          id="data-portal-drawer"
+          class="hidden absolute top-16 right-0 w-80 sm:w-96 bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-2xl z-50 space-y-4"
+        >
+          <div
+            class="flex justify-between items-center border-b border-slate-700 pb-2"
+          >
+            <span
+              class="text-xs font-bold uppercase tracking-wider text-[#018945]"
+              >On-Demand Layout Port</span
+            >
+            <button
+              onclick="window.processDataPortalImport()"
+              class="text-[10px] bg-[#018945] hover:bg-green-700 text-white font-bold px-3 py-1 rounded transition"
+            >
+              Import Map Matrix
+            </button>
+          </div>
+          <textarea
+            id="data-matrix-portal-text"
+            class="w-full h-48 bg-slate-950 text-slate-300 font-mono text-[11px] p-3 rounded-lg border border-slate-800 focus:outline-none focus:border-slate-600"
+            placeholder="Pasted engine state JSON targets print directly here..."
+          ></textarea>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN INTERFACE VIEWPORT -->
+    <main
+      class="max-w-7xl mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8"
+    >
+      <!-- CORE SWOT ENTITY GRID CARDS -->
+      <div class="lg:col-span-7 space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- STRENGTHS -->
+          <div
+            class="bg-slate-800/70 p-5 rounded-xl border border-slate-800 flex flex-col shadow-md"
+          >
+            <h2
+              class="text-white font-bold tracking-wide text-xs flex items-center gap-2 mb-4"
+            >
+              <span class="w-2.5 h-2.5 rounded-full bg-[#018945]"></span>
+              Strengths (Internal Assets)
+            </h2>
+            <div class="flex gap-2 mb-4">
+              <input
+                id="input-Strength"
+                type="text"
+                placeholder="Add engineering resource asset..."
+                class="bg-slate-900 border border-slate-700 rounded-md text-xs w-full px-3 py-2 text-white focus:outline-none focus:border-[#018945] placeholder-slate-500 font-medium"
+              />
+              <button
+                onclick="window.addSWOTNode('Strength')"
+                class="bg-[#018945] hover:bg-green-700 text-white px-4 py-2 text-xs font-bold rounded-md transition"
+              >
+                +
+              </button>
+            </div>
+            <div
+              id="list-Strength"
+              class="space-y-2 min-h-[110px] flex-1 p-2 bg-slate-900/40 rounded-lg border border-dashed border-slate-800"
+            ></div>
+          </div>
+
+          <!-- WEAKNESSES -->
+          <div
+            class="bg-slate-800/70 p-5 rounded-xl border border-slate-800 flex flex-col shadow-md"
+          >
+            <h2
+              class="text-white font-bold tracking-wide text-xs flex items-center gap-2 mb-4"
+            >
+              <span class="w-2.5 h-2.5 rounded-full bg-[#e6aaa0]"></span>
+              Weaknesses (Internal Liabilities)
+            </h2>
+            <div class="flex gap-2 mb-4">
+              <input
+                id="input-Weakness"
+                type="text"
+                placeholder="Add operational constraints..."
+                class="bg-slate-900 border border-slate-700 rounded-md text-xs w-full px-3 py-2 text-white focus:outline-none focus:border-[#e6aaa0] placeholder-slate-500 font-medium"
+              />
+              <button
+                onclick="window.addSWOTNode('Weakness')"
+                class="bg-[#e6aaa0] hover:bg-rose-300 text-slate-950 px-4 py-2 text-xs font-bold rounded-md transition"
+              >
+                +
+              </button>
+            </div>
+            <div
+              id="list-Weakness"
+              class="space-y-2 min-h-[110px] flex-1 p-2 bg-slate-900/40 rounded-lg border border-dashed border-slate-800"
+            ></div>
+          </div>
+
+          <!-- OPPORTUNITIES -->
+          <div
+            class="bg-slate-800/70 p-5 rounded-xl border border-slate-800 flex flex-col shadow-md"
+          >
+            <h2
+              class="text-white font-bold tracking-wide text-xs flex items-center gap-2 mb-4"
+            >
+              <span class="w-2.5 h-2.5 rounded-full bg-[#6ea0dd]"></span>
+              Opportunities (External Market)
+            </h2>
+            <div class="flex gap-2 mb-4">
+              <input
+                id="input-Opportunity"
+                type="text"
+                placeholder="Add transition pipeline path..."
+                class="bg-slate-900 border border-slate-700 rounded-md text-xs w-full px-3 py-2 text-white focus:outline-none focus:border-[#6ea0dd] placeholder-slate-500 font-medium"
+              />
+              <button
+                onclick="window.addSWOTNode('Opportunity')"
+                class="bg-[#6ea0dd] hover:bg-blue-400 text-slate-950 px-4 py-2 text-xs font-bold rounded-md transition"
+              >
+                +
+              </button>
+            </div>
+            <div
+              id="list-Opportunity"
+              class="space-y-2 min-h-[110px] flex-1 p-2 bg-slate-900/40 rounded-lg border border-dashed border-slate-800"
+            ></div>
+          </div>
+
+          <!-- THREATS -->
+          <div
+            class="bg-slate-800/70 p-5 rounded-xl border border-slate-800 flex flex-col shadow-md"
+          >
+            <h2
+              class="text-white font-bold tracking-wide text-xs flex items-center gap-2 mb-4"
+            >
+              <span class="w-2.5 h-2.5 rounded-full bg-[#e14b28]"></span>
+              Threats (External Risks)
+            </h2>
+            <div class="flex gap-2 mb-4">
+              <input
+                id="input-Threat"
+                type="text"
+                placeholder="Add macro competitive risks..."
+                class="bg-slate-900 border border-slate-700 rounded-md text-xs w-full px-3 py-2 text-white focus:outline-none focus:border-[#e14b28] placeholder-slate-500 font-medium"
+              />
+              <button
+                onclick="window.addSWOTNode('Threat')"
+                class="bg-[#e14b28] hover:bg-red-600 text-white px-4 py-2 text-xs font-bold rounded-md transition"
+              >
+                +
+              </button>
+            </div>
+            <div
+              id="list-Threat"
+              class="space-y-2 min-h-[110px] flex-1 p-2 bg-slate-900/40 rounded-lg border border-dashed border-slate-800"
+            ></div>
+          </div>
+        </div>
+
+        <!-- REFINED INTERACTIVE LINK CANVAS VISUALIZER -->
+        <div
+          id="mindmap-viewport"
+          class="bg-slate-800/90 p-6 rounded-xl border border-slate-800 shadow-xl min-h-[440px] flex flex-col relative bv-grid-canvas"
+        >
+          <div
+            class="flex justify-between items-center border-b border-slate-700/60 pb-3 mb-6"
+          >
+            <h3
+              class="text-white font-bold text-xs tracking-wide uppercase flex items-center gap-2"
+            >
+              <span
+                class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"
+              ></span>
+              Core Relational Spatial Mapping Matrix
+            </h3>
+            <span
+              id="clear-focus-trigger"
+              onclick="window.clearFocus()"
+              class="text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white bg-slate-700 px-3 py-1.5 rounded-md cursor-pointer hidden transition"
+            >
+              Clear Focus ×
+            </span>
+          </div>
+          <div
+            id="mindmap-canvas"
+            class="flex-1 flex flex-col justify-between relative min-h-[340px]"
+          ></div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: THREE HORIZONS PERFORMANCE PIPELINE CONTAINER -->
+      <div class="lg:col-span-5 space-y-8">
+        <div
+          class="bg-slate-800/70 p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col"
+        >
+          <div class="mb-4">
+            <span
+              class="text-[#018945] font-bold uppercase tracking-wider text-[10px] block mb-1"
+            >
+              Club van Doeners Execution
+            </span>
+            <h2
+              class="text-white font-bold tracking-wide text-sm flex items-center gap-2"
+            >
+              Three Horizons Project Pipeline
+            </h2>
+          </div>
+
+          <div
+            class="flex flex-col sm:flex-row gap-2 mb-6 bg-slate-900 p-3 rounded-lg border border-slate-800"
+          >
+            <input
+              id="input-Project"
+              type="text"
+              placeholder="Name deployment initiative objective..."
+              class="bg-slate-800 border border-slate-700 rounded-md text-xs w-full px-3 py-2 text-white focus:outline-none focus:border-slate-500 placeholder-slate-500 font-medium"
+            />
+            <div class="flex gap-2 shrink-0">
+              <select
+                id="select-Horizon"
+                class="bg-slate-800 border border-slate-700 rounded-md px-2 py-2 text-xs text-white font-bold focus:outline-none"
+              >
+                <option value="H1">H1 (0-12m)</option>
+                <option value="H2">H2 (12-36m)</option>
+                <option value="H3">H3 (36-72m)</option>
+              </select>
+              <button
+                onclick="window.addProjectNode()"
+                class="bg-white hover:bg-slate-200 text-slate-950 px-4 py-2 text-xs font-bold rounded-md transition"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <!-- HORIZONS ROUTINES STYLED PIPELINES -->
+          <div class="space-y-4">
+            <!-- HORIZON 1 CONTAINER -->
+            <div
+              class="p-4 bg-slate-900 rounded-xl border-l-4 border-[#f0aa00] shadow-md"
+            >
+              <span
+                class="text-[11px] font-bold text-[#f0aa00] uppercase tracking-wide block mb-2"
+              >
+                Horizon 1: Maintain & Defend Core Assets (0-12 Months)
+              </span>
+              <div
+                id="list-H1"
+                class="space-y-2 min-h-[60px] p-1 bg-slate-800/20 rounded-md border border-dashed border-slate-800"
+              ></div>
+            </div>
+
+            <!-- HORIZON 2 CONTAINER -->
+            <div
+              class="p-4 bg-slate-900 rounded-xl border-l-4 border-[#6ea0dd] shadow-md"
+            >
+              <span
+                class="text-[11px] font-bold text-[#6ea0dd] uppercase tracking-wide block mb-2"
+              >
+                Horizon 2: Scale High-Growth Transition Systems (12-36 Months)
+              </span>
+              <div
+                id="list-H2"
+                class="space-y-2 min-h-[60px] p-1 bg-slate-800/20 rounded-md border border-dashed border-slate-800"
+              ></div>
+            </div>
+
+            <!-- HORIZON 3 CONTAINER -->
+            <div
+              class="p-4 bg-slate-900 rounded-xl border-l-4 border-[#018945] shadow-md"
+            >
+              <span
+                class="text-[11px] font-bold text-[#018945] uppercase tracking-wide block mb-2"
+              >
+                Horizon 3: Seed Viable Long-Term Disruptive Tech (36-72 Months)
+              </span>
+              <div
+                id="list-H3"
+                class="space-y-2 min-h-[60px] p-1 bg-slate-800/20 rounded-md border border-dashed border-slate-800"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- PROCESSING SCRIPTS AND ARCHITECTURAL PERSISTENCE ENGINGE -->
+    <script>
+      // =========================================================================
+      // SECTION I: ARCHITECTURAL DATA STRUCT LAYOUT
+      // =========================================================================
+
+      window.state = {
+        nodes: [
+          {
+            id: "n1",
+            type: "SWOT",
+            subtype: "Strength",
+            label: "High Engineering Adaptability",
+          },
+          {
+            id: "n2",
+            type: "SWOT",
+            subtype: "Weakness",
+            label: "Limited Budgetary Fluidity",
+          },
+          {
+            id: "n3",
+            type: "SWOT",
+            subtype: "Opportunity",
+            label: "Expanding European Cleantech Mandates",
+          },
+          {
+            id: "n4",
+            type: "SWOT",
+            subtype: "Threat",
+            label: "Aggressive Pricing Vectors from Legacy Rivals",
+          },
+          {
+            id: "n5",
+            type: "Project",
+            horizon: "H1",
+            label: "Project Alpha: Compliance Pipeline Buildout",
+          },
+          {
+            id: "n6",
+            type: "Project",
+            horizon: "H2",
+            label: "Project Beta: Next-Gen Core Platform R&D",
+          },
+          {
+            id: "n7",
+            type: "Project",
+            horizon: "H3",
+            label: "Project Gamma: Sub-Saharan Market Discovery",
+          },
+        ],
+        edges: [
+          { id: "e1", sourceId: "n5", targetId: "n2" },
+          { id: "e2", sourceId: "n5", targetId: "n3" },
+          { id: "e3", sourceId: "n6", targetId: "n1" },
+        ],
+        selectedNodeId: "n5",
+      };
+
+      window.verbTaxonomy = {
+        projectToSwot: {
+          Strength: {
+            forward: "Leverages Asset",
+            inverse: "Amplifies Cohesion",
+          },
+          Weakness: {
+            forward: "Mitigates Drag",
+            inverse: "Counteracts Impact",
+          },
+          Opportunity: {
+            forward: "Exploits Opening",
+            inverse: "Captures Position",
+          },
+          Threat: {
+            forward: "Neutralizes Risk",
+            inverse: "Defends Operations",
+          },
+        },
+        swotToSwot: {
+          "Strength->Weakness": {
+            forward: "Offsets Drag",
+            inverse: "Compensates For",
+          },
+          "Strength->Opportunity": {
+            forward: "Accelerates Capture",
+            inverse: "Capitalizes On",
+          },
+          "Strength->Threat": {
+            forward: "Blunts Impact",
+            inverse: "Shields Against",
+          },
+          "Weakness->Threat": {
+            forward: "Exacerbates Exposure",
+            inverse: "Worsens Risk",
+          },
+          "Opportunity->Threat": {
+            forward: "Counterbalances",
+            inverse: "Displaces Exposure",
+          },
+        },
+      };
+
+      // =========================================================================
+      // SECTION II: PORT DATA SERIALIZER COMMAND LINES
+      // =========================================================================
+
+      window.toggleAndPopulateDataDrawer = function () {
+        const drawerEl = document.getElementById("data-portal-drawer");
+        const targetTextField = document.getElementById(
+          "data-matrix-portal-text",
+        );
+        if (!drawerEl) return;
+
+        drawerEl.classList.toggle("hidden");
+        if (!drawerEl.classList.contains("hidden")) {
+          targetTextField.value = JSON.stringify(
+            { nodes: window.state.nodes, edges: window.state.edges },
+            null,
+            2,
+          );
+        }
+      };
+
+      window.getAutomatedVerb = function (source, target) {
+        if (source.type === "Project" && target.type === "SWOT") {
+          return (
+            window.verbTaxonomy.projectToSwot[target.subtype] || {
+              forward: "Maps Pipeline",
+              inverse: "Links Back",
+            }
+          );
+        }
+        if (source.type === "SWOT" && target.type === "Project") {
+          return window.verbTaxonomy.projectToSwot[source.subtype]
+            ? {
+                forward:
+                  window.verbTaxonomy.projectToSwot[source.subtype].inverse,
+                inverse:
+                  window.verbTaxonomy.projectToSwot[source.subtype].forward,
+              }
+            : { forward: "Informs Design", inverse: "Aligns With" };
+        }
+        if (source.type === "SWOT" && target.type === "SWOT") {
+          const forwardKey = `${source.subtype}->${target.subtype}`;
+          if (window.verbTaxonomy.swotToSwot[forwardKey])
+            return window.verbTaxonomy.swotToSwot[forwardKey];
+
+          const reverseKey = `${target.subtype}->${source.subtype}`;
+          if (window.verbTaxonomy.swotToSwot[reverseKey]) {
+            return {
+              forward: window.verbTaxonomy.swotToSwot[reverseKey].inverse,
+              inverse: window.verbTaxonomy.swotToSwot[reverseKey].forward,
+            };
+          }
+        }
+        return { forward: "Integrates With", inverse: "Relates With" };
+      };
+
+      window.renderAll = function () {
+        window.renderInterfaceListsOnly();
+        window.renderSpatialMindMapCanvas();
+      };
+
+      // =========================================================================
+      // SECTION III: INTERFACE ENGINE COMPILING GENERATION
+      // =========================================================================
+
+      window.renderInterfaceListsOnly = function () {
+        const swotBuckets = ["Strength", "Weakness", "Opportunity", "Threat"];
+        const horizonBuckets = ["H1", "H2", "H3"];
+
+        swotBuckets.forEach(
+          (b) => (document.getElementById(`list-${b}`).innerHTML = ""),
+        );
+        horizonBuckets.forEach(
+          (h) => (document.getElementById(`list-${h}`).innerHTML = ""),
+        );
+
+        window.state.nodes.forEach((node) => {
+          let domContainer = null;
+          let colorAccentBorder = "";
+
+          if (node.type === "SWOT") {
+            domContainer = document.getElementById(`list-${node.subtype}`);
+            if (node.subtype === "Strength")
+              colorAccentBorder = "border-l-4 border-[#018945]";
+            if (node.subtype === "Weakness")
+              colorAccentBorder = "border-l-4 border-[#e6aaa0]";
+            if (node.subtype === "Opportunity")
+              colorAccentBorder = "border-l-4 border-[#6ea0dd]";
+            if (node.subtype === "Threat")
+              colorAccentBorder = "border-l-4 border-[#e14b28]";
+          } else if (node.type === "Project") {
+            domContainer = document.getElementById(`list-${node.horizon}`);
+            if (node.horizon === "H1")
+              colorAccentBorder = "border-l-4 border-[#f0aa00]";
+            if (node.horizon === "H2")
+              colorAccentBorder = "border-l-4 border-[#6ea0dd]";
+            if (node.horizon === "H3")
+              colorAccentBorder = "border-l-4 border-[#018945]";
+          }
+
+          if (!domContainer) return;
+          const isSelected = window.state.selectedNodeId === node.id;
+
+          const cardMarkupHtml = `
+            <div data-id="${node.id}" 
+                 id="card-${node.id}"
+                 onclick="window.selectNode('${node.id}')"
+                 ondblclick="window.enableInlineEditing('${node.id}')"
+                 draggable="true"
+                 ondragstart="window.handleCardDragStart(event, '${node.id}')"
+                 ondragover="window.handleCardDragOver(event, '${node.id}')"
+                 ondragleave="window.handleCardDragLeave(event, '${node.id}')"
+                 ondrop="window.handleCardDrop(event, '${node.id}')"
+                 class="p-3 bg-slate-900 border border-slate-800 rounded-lg text-xs flex justify-between items-center group cursor-pointer transition relative select-none ${colorAccentBorder} ${isSelected ? "ring-2 ring-slate-400 bg-slate-800 shadow-md shadow-black/20" : "hover:bg-slate-850"}">
+                <div class="flex items-center gap-3 w-full pr-6 pointer-events-none">
+                    <span class="text-slate-600 group-hover:text-slate-400 font-bold tracking-tight handle-grab-trigger cursor-grab pointer-events-auto select-none text-sm">⋮⋮</span>
+                    <input type="text" id="input-field-el-${node.id}"
+                           value="${node.label.replace(/"/g, "&quot;")}" 
+                           disabled
+                           onblur="window.disableAndCommitInlineEditing('${node.id}', this.value)"
+                           onchange="window.disableAndCommitInlineEditing('${node.id}', this.value)"
+                           onclick="event.stopPropagation()"
+                           class="bg-transparent text-slate-200 focus:outline-none focus:bg-slate-950 rounded px-1 py-0.5 w-full font-semibold pointer-events-none cursor-default focus:cursor-text truncate focus:overflow-visible focus:whitespace-normal">
+                </div>
+                <button onclick="event.stopPropagation(); window.deleteNodeEntity('${node.id}')" class="text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition text-md font-bold absolute right-2 pointer-events-auto">×</button>
+            </div>
+          `;
+          domContainer.insertAdjacentHTML("beforeend", cardMarkupHtml);
+        });
+      };
+
+      window.enableInlineEditing = function (id) {
+        const targetInputEl = document.getElementById(`input-field-el-${id}`);
+        if (targetInputEl) {
+          targetInputEl.removeAttribute("disabled");
+          targetInputEl.parentElement.classList.remove("pointer-events-none");
+          targetInputEl.classList.remove("pointer-events-none");
+          targetInputEl.classList.add("pointer-events-auto");
+          targetInputEl.focus();
+          targetInputEl.select();
+        }
+      };
+
+      window.disableAndCommitInlineEditing = function (id, valueStr) {
+        const targetNode = window.state.nodes.find((n) => n.id === id);
+        if (targetNode) {
+          targetNode.label = valueStr.trim() || "Unnamed Parameter Asset";
+        }
+        window.renderAll();
+      };
+
+      // =========================================================================
+      // SECTION IV: DRAG INTERACTIVE LINK HANDLER ROUTINES
+      // =========================================================================
+
+      window.handleCardDragStart = function (event, nodeId) {
+        event.dataTransfer.setData("text/plain", nodeId);
+        event.dataTransfer.effectAllowed = "copyMove";
+        const el = document.getElementById(`card-${nodeId}`);
+        if (el) el.classList.add("opacity-30");
+      };
+
+      window.handleCardDragOver = function (event, targetNodeId) {
+        event.preventDefault();
+        const el = document.getElementById(`card-${targetNodeId}`);
+        if (el) el.classList.add("drop-target-hover");
+      };
+
+      window.handleCardDragLeave = function (event, targetNodeId) {
+        const el = document.getElementById(`card-${targetNodeId}`);
+        if (el) el.classList.remove("drop-target-hover");
+      };
+
+      window.handleCardDrop = function (event, targetNodeId) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const originNodeId = event.dataTransfer.getData("text/plain");
+        const el = document.getElementById(`card-${targetNodeId}`);
+        if (el) el.classList.remove("drop-target-hover");
+
+        if (!originNodeId || originNodeId === targetNodeId) {
+          window.renderAll();
+          return;
+        }
+
+        const isDuplicate = window.state.edges.some(
+          (e) =>
+            (e.sourceId === originNodeId && e.targetId === targetNodeId) ||
+            (e.sourceId === targetNodeId && e.targetId === originNodeId),
+        );
+
+        if (!isDuplicate) {
+          window.state.edges.push({
+            id: "e_" + Math.random().toString(36).substr(2, 9),
+            sourceId: originNodeId,
+            targetId: targetNodeId,
+          });
+          window.state.selectedNodeId = originNodeId;
+        }
+        window.renderAll();
+      };
+
+      // =========================================================================
+      // SECTION V: GRAPH MATRIX VIEWPORT CANVAS GENERATOR BUILDERS
+      // =========================================================================
+
+      window.renderSpatialMindMapCanvas = function () {
+        const canvas = document.getElementById("mindmap-canvas");
+        const clearBtn = document.getElementById("clear-focus-trigger");
+
+        if (!window.state.selectedNodeId) {
+          canvas.innerHTML = `
+            <div class="text-xs text-slate-400 font-semibold tracking-wide text-center max-w-xs m-auto leading-relaxed p-4 rounded-lg border border-slate-700 bg-slate-900/60">
+              Select an item or Drag parameters directly over each other to compute architectural links.
+            </div>
+          `;
+          clearBtn.classList.add("hidden");
+          return;
+        }
+
+        clearBtn.classList.remove("hidden");
+        const focusNode = window.state.nodes.find(
+          (n) => n.id === window.state.selectedNodeId,
+        );
+        if (!focusNode) return;
+
+        const links = {
+          strengths: [],
+          opportunities: [],
+          weaknesses: [],
+          threats: [],
+          projects: [],
+        };
+
+        window.state.edges.forEach((edge) => {
+          let relatedNode = null;
+          let outgoingDirection = true;
+
+          if (edge.sourceId === focusNode.id) {
+            relatedNode = window.state.nodes.find(
+              (n) => n.id === edge.targetId,
+            );
+            outgoingDirection = true;
+          } else if (edge.targetId === focusNode.id) {
+            relatedNode = window.state.nodes.find(
+              (n) => n.id === edge.sourceId,
+            );
+            outgoingDirection = false;
+          }
+
+          if (!relatedNode) return;
+
+          const labelPhrase = outgoingDirection
+            ? window.getAutomatedVerb(focusNode, relatedNode).forward
+            : window.getAutomatedVerb(relatedNode, focusNode).forward;
+
+          const bundle = {
+            edgeId: edge.id,
+            node: relatedNode,
+            verb: labelPhrase,
+          };
+
+          if (relatedNode.type === "Project") {
+            links.projects.push(bundle);
+          } else {
+            if (relatedNode.subtype === "Strength")
+              links.strengths.push(bundle);
+            if (relatedNode.subtype === "Weakness")
+              links.weaknesses.push(bundle);
+            if (relatedNode.subtype === "Opportunity")
+              links.opportunities.push(bundle);
+            if (relatedNode.subtype === "Threat") links.threats.push(bundle);
+          }
+        });
+
+        // Focal point contrast color mappings (Clear backgrounds with crisp matching text rules)
+        let centerStyleClasses =
+          "bg-slate-900 border-slate-700 text-slate-100 ring-4 ring-slate-700/30";
+        if (focusNode.type === "SWOT") {
+          if (focusNode.subtype === "Strength")
+            centerStyleClasses =
+              "bg-slate-900 border-2 border-[#018945] text-slate-100 ring-4 ring-[#018945]/20";
+          if (focusNode.subtype === "Weakness")
+            centerStyleClasses =
+              "bg-slate-900 border-2 border-[#e6aaa0] text-slate-100 ring-4 ring-[#e6aaa0]/20";
+          if (focusNode.subtype === "Opportunity")
+            centerStyleClasses =
+              "bg-slate-900 border-2 border-[#6ea0dd] text-slate-100 ring-4 ring-[#6ea0dd]/20";
+          if (focusNode.subtype === "Threat")
+            centerStyleClasses =
+              "bg-slate-900 border-2 border-[#e14b28] text-slate-100 ring-4 ring-[#e14b28]/20";
+        } else if (focusNode.type === "Project") {
+          centerStyleClasses =
+            "bg-slate-100 border-2 border-white text-slate-900 ring-4 ring-white/20 shadow-xl";
+        }
+
+        const createNodeMarkupCard = (b) => `
+          <div class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-[11px] shadow-md relative group max-w-[180px] w-full text-center">
+              <div class="text-[9px] uppercase tracking-wide text-slate-400 font-bold mb-1 block">
+                  ${b.verb}
+              </div>
+              <div class="text-slate-200 font-semibold leading-tight line-clamp-2">${b.node.label}</div>
+              <button onclick="window.removeEdgeRelationship('${b.edgeId}')" class="absolute -top-1.5 -right-1.5 bg-slate-800 text-slate-400 hover:text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition border border-slate-600 font-bold text-xs shadow-md">×</button>
+          </div>
+        `;
+
+        if (focusNode.type === "Project") {
+          canvas.innerHTML = `
+            <div class="grid grid-cols-3 gap-2 items-center w-full my-auto">
+                <div class="flex flex-col gap-4 items-end justify-center pr-4 border-r border-dashed border-slate-700 min-h-[240px]">
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#018945]">Strengths</div>
+                    ${links.strengths.length ? links.strengths.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">No links</span>'}
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#6ea0dd] mt-2">Opportunities</div>
+                    ${links.opportunities.length ? links.opportunities.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">No links</span>'}
+                </div>
+                <div class="flex justify-center px-2">
+                    <div class="p-4 rounded-xl text-center max-w-full ${centerStyleClasses}">
+                        <div class="text-[9px] font-bold uppercase tracking-wider opacity-60 mb-2">Focal Initiative [${focusNode.horizon}]</div>
+                        <div class="leading-snug font-bold text-sm">${focusNode.label}</div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-4 items-start justify-center pl-4 border-l border-dashed border-slate-700 min-h-[240px]">
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#e6aaa0]">Weaknesses</div>
+                    ${links.weaknesses.length ? links.weaknesses.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">No links</span>'}
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#e14b28] mt-2">Threats</div>
+                    ${links.threats.length ? links.threats.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">No links</span>'}
+                </div>
+            </div>
+          `;
+        } else {
+          canvas.innerHTML = `
+            <div class="grid grid-cols-3 gap-2 items-center w-full flex-1">
+                <div class="flex flex-col gap-3 items-end justify-center pr-4 border-r border-dashed border-slate-700">
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#018945]">Strengths</div>
+                    ${links.strengths.length ? links.strengths.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">None</span>'}
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#6ea0dd] mt-1">Opportunities</div>
+                    ${links.opportunities.length ? links.opportunities.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">None</span>'}
+                </div>
+                <div class="flex justify-center px-2">
+                    <div class="p-4 rounded-xl text-center max-w-full ${centerStyleClasses}">
+                        <div class="text-[9px] font-bold uppercase tracking-wider opacity-60 mb-2">Focal SWOT [${focusNode.subtype.toUpperCase()}]</div>
+                        <div class="leading-snug font-bold text-sm">${focusNode.label}</div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3 items-start justify-center pl-4 border-l border-dashed border-slate-700">
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#e6aaa0]">Weaknesses</div>
+                    ${links.weaknesses.length ? links.weaknesses.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">None</span>'}
+                    <div class="text-[9px] font-bold uppercase tracking-wider text-[#e14b28] mt-1">Threats</div>
+                    ${links.threats.length ? links.threats.map(createNodeMarkupCard).join("") : '<span class="text-[10px] text-slate-500 font-medium italic">None</span>'}
+                </div>
+            </div>
+            <div class="w-full pt-4 mt-4 border-t border-slate-700/60 flex flex-col items-center bg-slate-900/40 rounded-xl p-3">
+                <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-3">Connected Delivery Projects Pipeline</div>
+                <div class="flex flex-wrap gap-3 justify-center w-full">
+                    ${links.projects.length ? links.projects.map(createNodeMarkupCard).join("") : '<span class="text-[11px] text-slate-500 font-medium italic py-1">No execution projects linked.</span>'}
+                </div>
+            </div>
+          `;
+        }
+      };
+
+      window.selectNode = function (id) {
+        const activeInputEl = document.getElementById(`input-field-el-${id}`);
+        if (activeInputEl && !activeInputEl.hasAttribute("disabled")) return;
+
+        window.state.selectedNodeId = id;
+        window.renderAll();
+      };
+
+      window.clearFocus = function () {
+        window.state.selectedNodeId = null;
+        window.renderAll();
+      };
+
+      window.addSWOTNode = function (subtype) {
+        const f = document.getElementById(`input-${subtype}`);
+        if (!f || !f.value.trim()) return;
+
+        const newId = "n_" + Math.random().toString(36).substr(2, 9);
+        window.state.nodes.push({
+          id: newId,
+          type: "SWOT",
+          subtype: subtype,
+          label: f.value.trim(),
+        });
+        f.value = "";
+        window.state.selectedNodeId = newId;
+        window.renderAll();
+      };
+
+      window.addProjectNode = function () {
+        const f = document.getElementById("input-Project");
+        const hSelect = document.getElementById("select-Horizon");
+        if (!f || !f.value.trim()) return;
+
+        const newId = "n_" + Math.random().toString(36).substr(2, 9);
+        window.state.nodes.push({
+          id: newId,
+          type: "Project",
+          horizon: hSelect.value,
+          label: f.value.trim(),
+        });
+        f.value = "";
+        window.state.selectedNodeId = newId;
+        window.renderAll();
+      };
+
+      window.deleteNodeEntity = function (id) {
+        window.state.nodes = window.state.nodes.filter((n) => n.id !== id);
+        window.state.edges = window.state.edges.filter(
+          (e) => e.sourceId !== id && e.targetId !== id,
+        );
+        if (window.state.selectedNodeId === id)
+          window.state.selectedNodeId = null;
+        window.renderAll();
+      };
+
+      window.removeEdgeRelationship = function (edgeId) {
+        window.state.edges = window.state.edges.filter((e) => e.id !== edgeId);
+        window.renderAll();
+      };
+
+      window.processDataPortalImport = function () {
+        const txt = document.getElementById("data-matrix-portal-text").value;
+        try {
+          const payload = JSON.parse(txt);
+          if (
+            payload &&
+            Array.isArray(payload.nodes) &&
+            Array.isArray(payload.edges)
+          ) {
+            window.state.nodes = payload.nodes;
+            window.state.edges = payload.edges;
+            window.state.selectedNodeId = payload.nodes.length
+              ? payload.nodes[0].id
+              : null;
+            window.renderAll();
+            document
+              .getElementById("data-portal-drawer")
+              .classList.add("hidden");
+          } else {
+            alert("Matrix Configuration Error: Missing core node layout maps.");
+          }
+        } catch (err) {
+          alert("Parsing Aborted: Recheck plain JSON syntax layout patterns.");
+        }
+      };
+
+      // =========================================================================
+      // SECTION VI: CONCURRENT DRAG REORDERING HOOKS
+      // =========================================================================
+      document.addEventListener("DOMContentLoaded", () => {
+        window.renderAll();
+
+        ["Strength", "Weakness", "Opportunity", "Threat"].forEach((cat) => {
+          Sortable.create(document.getElementById(`list-${cat}`), {
+            group: "swot-quadrant-shared-sort-pool",
+            handle: ".handle-grab-trigger",
+            animation: 120,
+            ghostClass: "bg-slate-950",
+            onAdd: function (evt) {
+              const nid = evt.item.dataset.id;
+              const dest = evt.to.id.replace("list-", "");
+              const n = window.state.nodes.find((item) => item.id === nid);
+              if (n) {
+                n.subtype = dest;
+                window.renderAll();
+              }
+            },
+          });
+        });
+
+        ["H1", "H2", "H3"].forEach((hor) => {
+          Sortable.create(document.getElementById(`list-${hor}`), {
+            group: "horizons-shared-sort-pool",
+            handle: ".handle-grab-trigger",
+            animation: 120,
+            ghostClass: "bg-slate-950",
+            onAdd: function (evt) {
+              const nid = evt.item.dataset.id;
+              const dest = evt.to.id.replace("list-", "");
+              const n = window.state.nodes.find((item) => item.id === nid);
+              if (n) {
+                n.horizon = dest;
+                window.renderAll();
+              }
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
