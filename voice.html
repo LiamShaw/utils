@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Voice Architecture & Style Engine</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg-gradient: linear-gradient(135deg, #090d16 0%, #02040a 100%);
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --accent-neon: #10b981;
+        --border-color: #334155;
+        --sub-bg: #0f172a;
+        --impact-bg: #090d16;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+        color: var(--text-main);
+        line-height: 1.6;
+        padding: 3rem 1rem;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1050px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+      header h1 {
+        font-size: 2.4rem;
+        margin-bottom: 0.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+      }
+      header h1 i {
+        margin-right: 0.5rem;
+        background: linear-gradient(to right, #818cf8, #6366f1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      header p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        margin-top: 0;
+      }
+
+      .section-card {
+        position: relative;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 2.2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        background-clip: padding-box;
+        border: 2px solid transparent;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .section-card::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          #ec4899,
+          #8b5cf6,
+          #3b82f6,
+          #10b981,
+          #f59e0b,
+          #ec4899
+        );
+        background-size: 400%;
+        border-radius: 18px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      .section-card:hover::before {
+        opacity: 1;
+        animation: spectrum-shift 12s linear infinite;
+      }
+      .section-card:hover {
+        box-shadow: 0 25px 35px -10px rgba(99, 102, 241, 0.25);
+      }
+
+      @keyframes spectrum-shift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      h2 {
+        margin-top: 0;
+        color: var(--text-main);
+        font-size: 1.35rem;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      h2 i {
+        color: var(--primary);
+      }
+
+      .question-block {
+        margin-bottom: 2rem;
+      }
+      .question-block:last-child {
+        margin-bottom: 0;
+      }
+      .question-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 0.25rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .question-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      @media (min-width: 768px) {
+        .options-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .option-item {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: rgba(15, 23, 42, 0.4);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        position: relative;
+      }
+      .option-item:hover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+      }
+      .option-header-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        gap: 1rem;
+      }
+      .option-title-text {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-main);
+      }
+      .option-item input[type="radio"] {
+        margin-top: 0.25rem;
+        accent-color: var(--primary);
+      }
+      .option-item.selected {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.12);
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--border-color);
+        transition: 0.3s ease;
+        border-radius: 20px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s ease;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--accent-neon);
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+
+      .impact-box {
+        background: var(--impact-bg);
+        border-left: 3px solid var(--accent-neon);
+        padding: 0.75rem 1rem;
+        border-radius: 0 8px 8px 0;
+        font-size: 0.82rem;
+        color: #cbd5e1;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .impact-box strong {
+        color: var(--accent-neon);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+
+      .input-group-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      @media (min-width: 768px) {
+        .input-group-row {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .inline-switcher-info {
+        background: var(--sub-bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+      }
+
+      .quick-switch-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      @media (min-width: 600px) {
+        .quick-switch-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 900px) {
+        .quick-switch-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      .switch-btn {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        justify-content: space-between;
+        box-sizing: border-box;
+      }
+      .switch-btn:hover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.1);
+      }
+      .switch-btn code {
+        font-size: 0.72rem;
+        color: var(--accent-neon);
+        background: #030508;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        align-self: flex-start;
+        margin-top: 0.25rem;
+        font-weight: bold;
+      }
+      .switch-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--sub-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+      }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      .btn-generate {
+        background: var(--accent-neon);
+        color: #0f172a;
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .btn-generate:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+        background: #12d393;
+      }
+      .action-container {
+        text-align: center;
+        margin: 3rem 0;
+      }
+
+      .output-section {
+        background: #070a12;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+        border: 1px solid var(--border-color);
+        margin-top: 2rem;
+      }
+      .output-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .output-header h3 {
+        color: white;
+        margin: 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .btn-copy {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .btn-copy:hover {
+        background: var(--primary-hover);
+      }
+
+      pre {
+        background: #030508;
+        padding: 1.25rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 0;
+        border: 1px solid #1f2937;
+      }
+      code {
+        font-family:
+          "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 0.88rem;
+        color: #e2e8f0;
+        white-space: pre-wrap;
+      }
+
+      /* Custom Notification Toast Modal Styling */
+      .toast-modal {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #f8fafc;
+        border: 2px solid var(--accent-neon);
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transform: translateY(100px);
+        opacity: 0;
+        transition:
+          transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+          opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .toast-modal.active {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .toast-modal i {
+        color: var(--accent-neon);
+        font-size: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>
+          <i class="fa-solid fa-bolt-lightning"></i> Voice Architecture Matrix
+        </h1>
+        <p>
+          Decouple structural syntax rules from collaboration stances and
+          situational overrides
+        </p>
+      </header>
+
+      <form id="voiceTunerForm">
+        <!-- Part 1: Guardrails to Activate -->
+        <div class="section-card">
+          <h2>
+            <i class="fa-solid fa-shield-halved"></i> 1. Guardrails to Activate
+          </h2>
+          <div class="question-block">
+            <div class="question-desc">
+              Enforce absolute syntax boundaries. These non-negotiable rules
+              stabilize the baseline regardless of the active style profile.
+            </div>
+
+            <div
+              style="
+                background: var(--sub-bg);
+                border: 1px dashed var(--primary);
+                padding: 1.25rem;
+                border-radius: 10px;
+                font-size: 0.95rem;
+                margin-bottom: 1.25rem;
+              "
+            >
+              <i
+                class="fa-solid fa-circle-nodes"
+                style="color: var(--primary); margin-right: 0.5rem"
+              ></i>
+              <strong>Global Plain Language Directive:</strong> Forces direct
+              sentence patterns. Artificial text padding is restricted.
+              Specialized terms or technical frameworks must be unpacked
+              instantly with plain-language definitions upon introduction.
+            </div>
+
+            <div class="options-grid">
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Enforce Total Em Dash Ban</span
+                  >
+                  <label class="switch"
+                    ><input type="checkbox" id="guardEmDash" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> Drops the probability
+                  weights of the em dash character to zero. The generator must
+                  build syntax using alternatives (commas, colons, or
+                  parenthetical elements).
+                </div>
+              </div>
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Restrict Exclamation Points</span
+                  >
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="guardExclamation"
+                      checked /><span class="slider"></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> Blocks the use of
+                  exclamation points across all generation cycles to keep text
+                  sounding objective, professional, and composed.
+                </div>
+              </div>
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Strip Conversational Emojis</span
+                  >
+                  <label class="switch"
+                    ><input type="checkbox" id="guardEmoji" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> Purges standard
+                  decorative chat icons from text generation loops, preventing
+                  unprofessional layouts in corporate files.
+                </div>
+              </div>
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Limit Inline Paragraph Bolding</span
+                  >
+                  <label class="switch"
+                    ><input type="checkbox" id="guardBold" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> Blocks the model from
+                  scattered bold formatting within paragraphs. Forces clean
+                  layout hierarchy through headers and explicit lists instead.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="question-block" style="margin-top: 1.5rem">
+            <div class="question-title">
+              Vocabulary Exclusion Matrix (AI Clichés)
+            </div>
+            <p
+              style="
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                margin-top: -0.5rem;
+                margin-bottom: 0.75rem;
+              "
+            >
+              Default exclusions: tapestry, myriad, delve, beacon, testament,
+              revolutionary, synergy.
+            </p>
+            <input
+              type="text"
+              id="bannedWordsInput"
+              placeholder="Add custom terms separated by commas to extend the word filter..."
+            />
+          </div>
+        </div>
+
+        <!-- Part 2: Response Behavior -->
+        <div class="section-card">
+          <h2>
+            <i class="fa-solid fa-envelope-open-text"></i> 2. Response Behavior
+          </h2>
+
+          <div class="question-block">
+            <div class="question-title">Output Justification Layer</div>
+            <div class="question-desc">
+              Calibrate interaction explanations. The baseline sets a critical,
+              peer-level partnership over passive task automation.
+            </div>
+
+            <div class="options-grid">
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="verbosity"
+                      value="Justification Mode"
+                      checked
+                    />
+                    Justification Mode</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> The model delivers your
+                  drafted text immediately without conversational chatter.
+                  Directly below the draft line, it prints a brief, bulleted
+                  analysis explaining the logic behind the initial composition
+                  or any requested edits.
+                </div>
+              </div>
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="verbosity"
+                      value="Absolute Silent Execution"
+                    />
+                    Absolute Silent Execution Mode</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> Cuts out all
+                  introductory talk, summaries, and analytical lists. The model
+                  acts as a pure, silent text processing engine, delivering raw
+                  content blocks directly.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="question-block" style="margin-top: 2rem">
+            <div class="question-title">Sourcing Rigor & Scope Validation</div>
+            <div class="question-desc">
+              Define validation metrics for statistical claims, market numbers,
+              or industry growth tracking.
+            </div>
+
+            <div class="options-grid">
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="sourcingRigor"
+                      value="Rigid Context Scope Validation"
+                      checked
+                    />
+                    Rigid Context Scope Validation</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> For any statistic used,
+                  the model must verify and label its exact boundary context
+                  (e.g., explicitly tracking whether data applies to a city
+                  local area, regional province, country, the EU, or a global
+                  pool) to prevent misleading scope blending.
+                </div>
+              </div>
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="sourcingRigor"
+                      value="Standard Balanced Knowledge"
+                    />
+                    Standard Base Knowledge Reference</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact on AI Output:</strong> Draws from the model's
+                  standard parametric memory. Integrates industry concepts
+                  smoothly without pausing generation to map out detailed
+                  regional data boundaries.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part 3: Text Output Style -->
+        <div class="section-card">
+          <h2>
+            <i class="fa-solid fa-wand-magic-sparkles"></i> 3. Text Output Style
+          </h2>
+          <div class="question-desc" style="margin-bottom: 1rem">
+            Four general tones are preset below. Choose one to start the
+            conversation. You can switch to a different tone later if the
+            context changes — for example, when moving from a formal email to a
+            casual text.
+          </div>
+
+          <!-- Initial Baseline Selection -->
+          <div class="question-block">
+            <div class="question-title">Starting Tone</div>
+            <div class="question-desc">
+              Pick the tone the model uses at the beginning of the conversation.
+            </div>
+            <div class="options-grid">
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="spectrumAnchor"
+                      value="Tier 1: Absolute Rigor"
+                    />
+                    Tier 1: Rigor</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact:</strong> Dense, logical, and evidence-heavy.
+                  Best for deep analysis, architecture reviews, and strategy
+                  papers.
+                </div>
+              </div>
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="spectrumAnchor"
+                      value="Tier 2: Structured Action"
+                      checked
+                    />
+                    Tier 2: Action</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact:</strong> Outcome-focused with active verbs and
+                  clean spacing. Best for emails, memos, and status updates.
+                </div>
+              </div>
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="spectrumAnchor"
+                      value="Tier 3: Conversational Lightness"
+                    />
+                    Tier 3: Lightness</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact:</strong> Approachable rhythm with varied
+                  sentences. Best for casual messages, bios, and community
+                  notes.
+                </div>
+              </div>
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    ><input
+                      type="radio"
+                      name="spectrumAnchor"
+                      value="Tier 4: Grounded Prose"
+                    />
+                    Tier 4: Prose</span
+                  >
+                </div>
+                <div class="impact-box">
+                  <strong>Impact:</strong> Factual and human-centered without
+                  sentimentality. Best for tributes, profiles, and sensitive
+                  narratives.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instant Switchers -->
+          <div class="inline-switcher-info">
+            <span
+              class="question-title"
+              style="font-size: 0.95rem; margin-bottom: 0.5rem"
+              ><i
+                class="fa-solid fa-bolt"
+                style="color: var(--accent-neon)"
+              ></i>
+              Switch Tone Mid-Conversation</span
+            >
+            <div class="question-desc">
+              If you need a different tone later — such as shifting from a
+              formal report to a quick text — paste one of these tags into your
+              next message.
+            </div>
+            <div class="quick-switch-grid">
+              <div class="switch-btn" onclick="copySwitchTag('[STYLE: RIGOR]')">
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >Tier 1: Rigor</span
+                  >
+                  <span class="switch-desc"
+                    >System architectures, deep analysis.</span
+                  >
+                </div>
+                <code>[STYLE: RIGOR]</code>
+              </div>
+              <div
+                class="switch-btn"
+                onclick="copySwitchTag('[STYLE: ACTION]')"
+              >
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >Tier 2: Action</span
+                  >
+                  <span class="switch-desc"
+                    >Memos, operations reports, updates.</span
+                  >
+                </div>
+                <code>[STYLE: ACTION]</code>
+              </div>
+              <div
+                class="switch-btn"
+                onclick="copySwitchTag('[STYLE: LIGHTNESS]')"
+              >
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >Tier 3: Lightness</span
+                  >
+                  <span class="switch-desc"
+                    >Civic alerts, casual summaries, bios.</span
+                  >
+                </div>
+                <code>[STYLE: LIGHTNESS]</code>
+              </div>
+              <div class="switch-btn" onclick="copySwitchTag('[STYLE: PROSE]')">
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >Tier 4: Prose</span
+                  >
+                  <span class="switch-desc"
+                    >Reflective narratives, character focus.</span
+                  >
+                </div>
+                <code>[STYLE: PROSE]</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voice Override -->
+          <div
+            class="question-block"
+            style="
+              margin-top: 1.5rem;
+              border-top: 1px dashed var(--border-color);
+              padding-top: 1.5rem;
+            "
+          >
+            <div class="intermix-header">
+              <span class="question-title"
+                ><i
+                  class="fa-solid fa-shuffle"
+                  style="color: var(--primary)"
+                ></i>
+                Custom Style Override</span
+              >
+              <label class="switch"
+                ><input
+                  type="checkbox"
+                  id="toggleIntermix"
+                  onchange="toggleIntermixField()" /><span class="slider"></span
+              ></label>
+            </div>
+            <div class="question-desc">
+              Turn this on to write your own style rules instead of using the
+              four presets.
+            </div>
+            <!-- Update this specific line to hide the field by default on startup -->
+            <div
+              id="intermixInputWrapper"
+              style="display: none; margin-top: 0.75rem"
+            >
+              <input
+                type="text"
+                id="intermixStyleRule"
+                placeholder="Example: Use very short paragraphs. Ban the word 'leverage'. Explain every acronym on first use."
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Part 4: Specific Workspace Overrides -->
+        <div class="section-card">
+          <h2>
+            <i class="fa-solid fa-sliders-up"></i> 4. Specific Workspace
+            Overrides
+          </h2>
+          <div class="question-block">
+            <div class="question-desc">
+              Refine optimization paths based on target demographic properties
+              and situational rules.
+            </div>
+
+            <div class="input-group-row">
+              <div>
+                <div class="question-title">Target Audience Definition</div>
+                <input
+                  type="text"
+                  id="targetAudienceInput"
+                  placeholder="Example: Executive Board, Academic Council, Local Community Group..."
+                />
+              </div>
+              <div>
+                <div class="question-title">Targeted Workspace Constraints</div>
+                <input
+                  type="text"
+                  id="workspaceConstraintsInput"
+                  placeholder="Example: Target maximum length 300 words, prioritize Netherlands port data..."
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-container">
+          <button
+            type="button"
+            class="btn-generate"
+            onclick="compileVoiceTuner()"
+          >
+            <i class="fa-solid fa-rocket"></i> Compile Workspace Prompt
+          </button>
+        </div>
+      </form>
+
+      <!-- Unified Output Terminal -->
+      <div class="output-section">
+        <div class="output-header">
+          <h3>
+            <i class="fa-solid fa-terminal"></i> Compiled Engine Instructions
+          </h3>
+          <button class="btn-copy" onclick="copyConfigContent()">
+            <i class="fa-solid fa-copy"></i> Copy Profile Payload
+          </button>
+        </div>
+        <p
+          style="
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: -0.5rem;
+            margin-bottom: 1.5rem;
+          "
+        >
+          Copy this combined instruction set into your model's system
+          instructions workspace or feed it directly into your initial prompt
+          turn.
+        </p>
+        <pre><code id="tunerOutputDisplay">Click generate to compile your custom prompt system parameters...</code></pre>
+      </div>
+    </div>
+
+    <!-- Clean App Modal Alert Overlay Container -->
+    <div id="toastNotification" class="toast-modal">
+      <i class="fa-solid fa-circle-check"></i>
+      <span id="toastMessage">Text copied to clipboard</span>
+    </div>
+
+    <script>
+      function showModalAlert(textString) {
+        const toast = document.getElementById("toastNotification");
+        const message = document.getElementById("toastMessage");
+        message.innerText = textString;
+
+        toast.classList.add("active");
+
+        // Auto dismiss mechanism safely clearing transition triggers
+        setTimeout(() => {
+          toast.classList.remove("active");
+        }, 2800);
+      }
+
+      function toggleIntermixField() {
+        const checked = document.getElementById("toggleIntermix").checked;
+        document.getElementById("intermixInputWrapper").style.display = checked
+          ? "block"
+          : "none";
+      }
+
+      function refreshSelectionStyles() {
+        document
+          .querySelectorAll('.option-item input[type="radio"]')
+          .forEach((radio) => {
+            const wrapper = radio.closest(".option-item");
+            if (radio.checked) wrapper.classList.add("selected");
+            else wrapper.classList.remove("selected");
+          });
+        document
+          .querySelectorAll('.option-item input[type="checkbox"]')
+          .forEach((cb) => {
+            const wrapper = cb.closest(".option-item");
+            if (cb.checked) wrapper.classList.add("selected");
+            else wrapper.classList.remove("selected");
+          });
+      }
+
+      document.querySelectorAll(".option-item input").forEach((input) => {
+        input.addEventListener("change", function () {
+          if (this.type === "radio") {
+            document
+              .querySelectorAll(`input[name="${this.name}"]`)
+              .forEach((r) => {
+                r.closest(".option-item").classList.remove("selected");
+              });
+          }
+          refreshSelectionStyles();
+        });
+      });
+
+      document.querySelectorAll(".option-item").forEach((item) => {
+        item.addEventListener("click", function (e) {
+          if (
+            e.target.tagName !== "INPUT" &&
+            e.target.tagName !== "LABEL" &&
+            !e.target.classList.contains("slider")
+          ) {
+            const input = this.querySelector("input");
+            if (input) {
+              if (input.type === "checkbox") {
+                input.checked = !input.checked;
+              } else if (input.type === "radio") {
+                input.checked = true;
+                document
+                  .querySelectorAll(`input[name="${input.name}"]`)
+                  .forEach((r) => {
+                    if (r !== input)
+                      r.closest(".option-item").classList.remove("selected");
+                  });
+              }
+              const event = new Event("change");
+              input.dispatchEvent(event);
+            }
+          }
+        });
+      });
+
+      function compileVoiceTuner() {
+        const activeAnchor = document.querySelector(
+          'input[name="spectrumAnchor"]:checked',
+        ).value;
+        const activeVerbosity = document.querySelector(
+          'input[name="verbosity"]:checked',
+        ).value;
+        const activeSourcing = document.querySelector(
+          'input[name="sourcingRigor"]:checked',
+        ).value;
+
+        const intermixActive =
+          document.getElementById("toggleIntermix").checked;
+        const intermixValue = intermixActive
+          ? document.getElementById("intermixStyleRule").value
+          : "Disabled";
+
+        const audienceValue =
+          document.getElementById("targetAudienceInput").value ||
+          "General Professional Audience";
+        const customConstraints =
+          document.getElementById("workspaceConstraintsInput").value ||
+          "None specified.";
+
+        const banEmDash = document.getElementById("guardEmDash").checked;
+        const banExclamation =
+          document.getElementById("guardExclamation").checked;
+        const banEmoji = document.getElementById("guardEmoji").checked;
+        const banBold = document.getElementById("guardBold").checked;
+
+        const restrictedFormatting = [];
+        if (banEmDash) restrictedFormatting.push("em-dash");
+        if (banExclamation) restrictedFormatting.push("exclamation-point");
+        if (banEmoji) restrictedFormatting.push("emojis");
+        if (banBold) restrictedFormatting.push("excessive-bolding");
+
+        const terminologyBans = [
+          "tapestry",
+          "myriad",
+          "delve",
+          "beacon",
+          "testament",
+          "revolutionary",
+          "synergy",
+        ];
+        const customInput = document.getElementById("bannedWordsInput").value;
+        if (customInput) {
+          customInput.split(",").forEach((word) => {
+            const cleanWord = word.trim().toLowerCase();
+            if (cleanWord && !terminologyBans.includes(cleanWord))
+              terminologyBans.push(cleanWord);
+          });
+        }
+
+        // Configuration Map
+        const schemaPayload = {
+          prompt_architecture_version: "6.0_DecoupledStyleMatrix",
+          interaction_profile: {
+            relationship_stance: "Critical Co-worker Blueprint",
+            output_justification_strategy: activeVerbosity,
+            sourcing_verification_rigor: activeSourcing,
+            global_anchors: [
+              "Strict plain language priority",
+              "Mandatory explanation of complex frameworks upon introduction",
+            ],
+          },
+          generation_style_layer: {
+            initial_default_tier_anchor: activeAnchor,
+            voice_override_intermix: intermixValue,
+            target_audience_optimization: audienceValue,
+            state_tokenization_enabled: true,
+            workspace_overrides: customConstraints,
+          },
+          operational_constraints: {
+            restricted_formatting_tokens: restrictedFormatting,
+            banned_token_matrix: terminologyBans,
+          },
+        };
+
+        // Execution Directives
+        let outputPrompt = `=== SYSTEM INSTRUCTION LAYER: ARCHITECTURE CONFIGURATION (JSON) ===\n`;
+        outputPrompt += `\`\`\`json\n${JSON.stringify(schemaPayload, null, 2)}\n\`\`\`\n\n`;
+
+        outputPrompt += `=== SYSTEM INSTRUCTION LAYER: OPERATIONAL INSTRUCTIONS ===\n\n`;
+        outputPrompt += `## 1. Global Guardrails & Restrictions\n`;
+        outputPrompt += `* **Plain Language Mandate:** Prioritize clear, direct sentence patterns. Eliminate artificial textual decoration or corporate padding.\n`;
+        outputPrompt += `* **Technical Shorthand Clarification:** When introducing specialized tools, methodologies, or architectural designs, provide an explicit, plain-language definition immediately within the syntax stream.\n`;
+        if (restrictedFormatting.length > 0) {
+          outputPrompt += `* **Layout Guardrails:** Apply an absolute generation ban restricting the allocation of: [${restrictedFormatting.join(", ")}]. Use standard punctuation variants (commas, colons, or parentheses) to manage text layout and emphasis.\n`;
+        }
+        outputPrompt += `* **Exclusion Vocabulary Matrix:** Immediately dump token weights to zero for the following elements, preventing them from appearing in output strings: ${terminologyBans.join(", ")}.\n`;
+
+        outputPrompt += `\n## 2. Response Behavior & Collaboration\n`;
+        outputPrompt += `* **Peer Alignment:** Position your internal reasoning as a critical co-worker. Do not generate generic sycophantic reassurance, cheerleading, or hollow validation text. Challenge assumptions, analyze flaws, and optimize structural logic.\n`;
+        outputPrompt += `* **Explanation Strategy:** Execute text outputs matching the [${activeVerbosity}] guideline. If justification mode is active, include a clean, bulleted list below the primary text output detailing the structural logic or change justifications applied.\n`;
+        outputPrompt += `* **Sourcing Rigor Metric:** Apply the [${activeSourcing}] directive. When processing data, stats, or metrics, explicitly check and state the exact context scope: clearly validating whether information represents local municipal, wider regional, national, continental, or global parameters.\n`;
+
+        outputPrompt += `\n## 3. Text Output Style & Continuum\n`;
+        outputPrompt += `* **Optimization Focus Target:** [${audienceValue}]. Optimize all tone parameters to carry authority with this specific target background.\n`;
+
+        if (intermixActive) {
+          outputPrompt += `* **Voice Override Intermix Configuration:** ACTIVE. Override default tier restrictions to support this custom hybrid profile: [${intermixValue}].\n`;
+        } else {
+          outputPrompt += `* **Initial Default Style Anchor:** Initialize text generation configurations targeting [${activeAnchor}].\n`;
+        }
+
+        outputPrompt += `\nRegulate paragraph structures, vocabulary metrics, and spacing densities to align with these internal continuum nodes:\n`;
+        outputPrompt += `* **Tier 1: Absolute Rigor** -> Deep strategic analysis, system architectural blueprints, objective framework mappings.\n`;
+        outputPrompt += `* **Tier 2: Structured Action** -> High velocity professional communications, delivery status logs, outcome-focused metrics tracking.\n`;
+        outputPrompt += `* **Tier 3: Conversational Lightness** -> Approachable community notifications, open networking profiles, clean rhythmic micro-copy.\n`;
+        outputPrompt += `* **Tier 4: Grounded Prose** -> Human-centric tributes, reflective character profiles, high-emotion contexts anchored entirely to factual accuracy.\n`;
+
+        outputPrompt += `\n## 4. Mid-Conversation Style Switches\n`;
+        outputPrompt += `1. **Silent Startup:** Adopt the default optimization setup quietly upon processing this instruction sheet. Do not print an introductory validation note.\n`;
+        outputPrompt += `2. **Inline Style Transition Tracking:** Scan every incoming user turn for an active style token. If a token is detected, shift your text generation parameters to match that state instantly, executing the switch silently without displaying a confirmation note:\n`;
+        outputPrompt += `   * \`[STYLE: RIGOR]\` -> Transition text output parameters to Tier 1 constraints.\n`;
+        outputPrompt += `   * \`[STYLE: ACTION]\` -> Transition text output parameters to Tier 2 constraints.\n`;
+        outputPrompt += `   * \`[STYLE: LIGHTNESS]\` -> Transition text output parameters to Tier 3 constraints.\n`;
+        outputPrompt += `   * \`[STYLE: PROSE]\` -> Transition text output parameters to Tier 4 constraints.\n`;
+        outputPrompt += `3. **Context Persistence:** Maintain active structural constraints, target audience boundaries, and vocabulary exclusion tables perfectly when executing a style transition.\n\n`;
+        outputPrompt += `## Workspace Overrides\n`;
+        outputPrompt += `* Target constraints: ${customConstraints}`;
+
+        document.getElementById("tunerOutputDisplay").innerText = outputPrompt;
+      }
+
+      function copyConfigContent() {
+        const display = document.getElementById("tunerOutputDisplay").innerText;
+        navigator.clipboard
+          .writeText(display)
+          .then(() => {
+            showModalAlert("System blueprint template copied to clipboard.");
+          })
+          .catch((err) => {
+            console.error("Failed to run clipboard write: ", err);
+          });
+      }
+
+      function copySwitchTag(tagString) {
+        // Prevent click bubbling from misaligning selection changes if items intersect layout fields
+        navigator.clipboard
+          .writeText(tagString)
+          .then(() => {
+            showModalAlert(`Copied token identifier: ${tagString}`);
+          })
+          .catch((err) => {
+            console.error("Failed to copy state token: ", err);
+          });
+      }
+
+      window.onload = function () {
+        refreshSelectionStyles();
+        compileVoiceTuner();
+      };
+    </script>
+  </body>
+</html>

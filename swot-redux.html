@@ -1,0 +1,1718 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strategic SWOT & Horizon Matrix Engine</title>
+    <!-- Bulma CSS Framework Default Core Stylesheet Integration -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
+    />
+    <!-- SortableJS for Fluid Handle-Free Drag Reordering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+    <!-- Google Material Symbols Outlined Font Sheet Integration -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <style>
+      :root {
+        --bv-green: #018945;
+        --bv-rose: #e6aaa0;
+        --bv-blue: #6ea0dd;
+        --bv-red: #e14b28;
+        --bv-yellow: #f0aa00;
+        --bv-orange: #e67e22;
+        --bv-violet: #8e44ad;
+      }
+      body {
+        background-color: #0f172a;
+        color: #e2e8f0;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.2);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--bv-green);
+      }
+      .bv-grid-canvas {
+        background-size: 24px 24px;
+        background-image:
+          linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.012) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.012) 1px,
+            transparent 1px
+          );
+      }
+      textarea {
+        resize: none;
+      }
+      /* Material symbols normalization rule */
+      .material-symbols-outlined {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        vertical-align: middle;
+      }
+      /* Custom Slate adaptations for Bulma semantic box defaults */
+      .box {
+        background-color: #1e293b !important;
+        color: #e2e8f0 !important;
+        border: 1px solid #334155 !important;
+      }
+      .strategic-card {
+        background-color: #0f172a !important;
+        border: 1px solid #1e293b !important;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer;
+        position: relative;
+      }
+      .strategic-card:hover {
+        background-color: rgba(30, 41, 59, 0.6) !important;
+      }
+      .strategic-card.active-focus {
+        box-shadow: 0 0 0 2px #64748b !important;
+        background-color: #0f172a !important;
+      }
+      .strategic-card textarea {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #f1f5f9 !important;
+        font-weight: 600;
+        width: 100%;
+      }
+      /* Far right icon tray hover visibility animations */
+      .expand-modal-btn {
+        opacity: 0;
+        transition: opacity 0.15s ease-in-out;
+      }
+      .strategic-card:hover .expand-modal-btn {
+        opacity: 1;
+      }
+      .strategic-card.active-focus .expand-modal-btn {
+        opacity: 1;
+      }
+      /* Bulma dark form adaptations overrides */
+      .input,
+      .textarea,
+      .select select {
+        background-color: #0f172a !important;
+        border-color: #334155 !important;
+        color: #f1f5f9 !important;
+      }
+      .input:focus,
+      .textarea:focus,
+      .select select:focus {
+        border-color: #64748b !important;
+        box-shadow: none !important;
+      }
+      .title,
+      .subtitle {
+        color: #ffffff !important;
+      }
+    </style>
+  </head>
+  <body class="bv-grid-canvas">
+    <!-- MASTER NAVBAR HEADER SYSTEM -->
+    <nav
+      class="navbar is-dark border-bottom border-slate-800 px-4 shadow-sm"
+      style="background-color: #0f172a"
+    >
+      <div
+        class="navbar-brand w-100 d-flex align-items-center justify-content-between"
+      >
+        <div class="navbar-item d-flex align-items-center gap-3">
+          <a
+            href="logo.svg"
+            target="_blank"
+            class="d-flex align-items-center text-decoration-none"
+            title="Open Core Logo Source Asset"
+          >
+            <img
+              src="logo.svg"
+              alt="Baas Verkley Logo"
+              style="height: 24px; width: auto"
+              onerror="
+                this.style.display = 'none';
+                document
+                  .getElementById('logo-fallback-text')
+                  .classList.remove('is-sr-only');
+              "
+            />
+            <span
+              id="logo-fallback-text"
+              class="is-sr-only has-text-white fw-bold text-uppercase"
+              >Baas Verkley</span
+            >
+          </a>
+          <div
+            class="is-divider-vertical px-1 has-background-grey-dark d-none d-sm-block"
+            style="height: 20px; width: 1px"
+          ></div>
+          <span
+            class="text-xs font-bold has-text-grey-light text-uppercase tracking-wider d-none d-sm-block"
+            >SWOT & Horizon Matrix Engine</span
+          >
+        </div>
+
+        <div class="navbar-item d-flex align-items-center gap-2 flex-wrap">
+          <button
+            onclick="triggerCSVImport()"
+            class="button is-small is-dark font-bold text-xs"
+          >
+            Import CSV
+          </button>
+          <input
+            type="file"
+            id="csv-file-hook"
+            class="is-hidden"
+            accept=".csv"
+            onchange="handleCSVImport(event)"
+          />
+          <button
+            onclick="exportToCSV()"
+            class="button is-small is-dark font-bold text-xs"
+          >
+            Export Excel Matrix
+          </button>
+          <div
+            class="is-divider-vertical mx-2 has-background-grey-dark"
+            style="height: 20px; width: 1px"
+          ></div>
+          <button
+            onclick="clearBoardToBlank()"
+            class="button is-small is-danger is-outlined font-bold text-xs"
+          >
+            Clear Board ↺
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- LIVE-EDITABLE STRATEGIC SCOPE BANNER -->
+    <div class="container is-fluid px-5 pt-4">
+      <div
+        class="box rounded-3 shadow-sm d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3"
+        style="background-color: rgba(30, 41, 59, 0.4) !important"
+      >
+        <div class="w-100 flex-grow-1" style="max-w: 680px">
+          <label
+            for="strategic-scope-input"
+            class="text-uppercase tracking-widest has-text-grey block mb-1"
+            style="font-size: 10px; font-weight: 700"
+            >Active Strategic Scope (Click to Edit)</label
+          >
+          <input
+            type="text"
+            id="strategic-scope-input"
+            name="strategic-scope-input"
+            onchange="updateStrategicScope(this.value)"
+            class="bg-transparent border-0 text-white fw-bold w-100 py-0.5 fs-5 font-sans"
+            style="outline: none"
+          />
+        </div>
+        <div class="text-md-end shrink-0 d-none d-sm-block">
+          <span
+            class="text-uppercase tracking-wider has-text-grey-dark font-mono d-block"
+            style="font-size: 10px"
+            >Business Unit Focus</span
+          >
+          <span
+            class="text-uppercase tracking-wide has-text-grey fw-bold"
+            style="font-size: 12px"
+            >Technical Installations Strategy</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT MATRIX: ASYMMETRIC 60/40 BULMA COLUMNS RATIO -->
+    <main class="container is-fluid px-5 py-4 flex-grow-1">
+      <div class="columns is-variable is-4">
+        <!-- THE SWOT ENVIRONMENT MATRIX GRID QUADRANT (60% WIDTH / 7 COLS)[cite: 2] -->
+        <div class="column is-7">
+          <div class="columns is-multiline is-variable is-3">
+            <!-- STRENGTHS -->
+            <div class="column is-6">
+              <div
+                class="box d-flex flex-column h-100"
+                style="min-height: 280px"
+              >
+                <div
+                  class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3"
+                  style="border-color: #334155 !important"
+                >
+                  <h2
+                    class="title is-6 mb-0 d-flex align-items-center gap-2"
+                    style="font-size: 13px"
+                  >
+                    <span
+                      class="p-1 rounded-circle d-inline-block"
+                      style="width: 8px; height: 8px; background-color: #018945"
+                    ></span>
+                    Strengths
+                    <span class="has-text-grey font-normal" id="count-Strength"
+                      >(0)</span
+                    >
+                  </h2>
+                  <button
+                    onclick="launchCreationModal('SWOT', 'Strength')"
+                    class="button is-small is-dark py-0 px-2 font-bold"
+                    style="height: 22px; font-size: 11px"
+                  >
+                    +
+                  </button>
+                </div>
+                <div
+                  id="pool-Strength"
+                  data-classification="Strength"
+                  class="d-flex flex-column gap-2 flex-grow-1 p-1 border border-dashed rounded"
+                  style="
+                    border-color: #334155 !important;
+                    background-color: rgba(15, 23, 42, 0.15);
+                    min-height: 150px;
+                  "
+                ></div>
+              </div>
+            </div>
+
+            <!-- WEAKNESSES -->
+            <div class="column is-6">
+              <div
+                class="box d-flex flex-column h-100"
+                style="min-height: 280px"
+              >
+                <div
+                  class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3"
+                  style="border-color: #334155 !important"
+                >
+                  <h2
+                    class="title is-6 mb-0 d-flex align-items-center gap-2"
+                    style="font-size: 13px"
+                  >
+                    <span
+                      class="p-1 rounded-circle d-inline-block"
+                      style="
+                        width: 8px;
+                        height: 8px;
+                        background-color: var(--bv-rose);
+                      "
+                    ></span>
+                    Weaknesses
+                    <span class="has-text-grey font-normal" id="count-Weakness"
+                      >(0)</span
+                    >
+                  </h2>
+                  <button
+                    onclick="launchCreationModal('SWOT', 'Weakness')"
+                    class="button is-small is-dark py-0 px-2 font-bold"
+                    style="height: 22px; font-size: 11px"
+                  >
+                    +
+                  </button>
+                </div>
+                <div
+                  id="pool-Weakness"
+                  data-classification="Weakness"
+                  class="d-flex flex-column gap-2 flex-grow-1 p-1 border border-dashed rounded"
+                  style="
+                    border-color: #334155 !important;
+                    background-color: rgba(15, 23, 42, 0.15);
+                    min-height: 150px;
+                  "
+                ></div>
+              </div>
+            </div>
+
+            <!-- OPPORTUNITIES -->
+            <div class="column is-6">
+              <div
+                class="box d-flex flex-column h-100"
+                style="min-height: 280px"
+              >
+                <div
+                  class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3"
+                  style="border-color: #334155 !important"
+                >
+                  <h2
+                    class="title is-6 mb-0 d-flex align-items-center gap-2"
+                    style="font-size: 13px"
+                  >
+                    <span
+                      class="p-1 rounded-circle d-inline-block"
+                      style="
+                        width: 8px;
+                        height: 8px;
+                        background-color: var(--bv-blue);
+                      "
+                    ></span>
+                    Opportunities
+                    <span
+                      class="has-text-grey font-normal"
+                      id="count-Opportunity"
+                      >(0)</span
+                    >
+                  </h2>
+                  <button
+                    onclick="launchCreationModal('SWOT', 'Opportunity')"
+                    class="button is-small is-dark py-0 px-2 font-bold"
+                    style="height: 22px; font-size: 11px"
+                  >
+                    +
+                  </button>
+                </div>
+                <div
+                  id="pool-Opportunity"
+                  data-classification="Opportunity"
+                  class="d-flex flex-column gap-2 flex-grow-1 p-1 border border-dashed rounded"
+                  style="
+                    border-color: #334155 !important;
+                    background-color: rgba(15, 23, 42, 0.15);
+                    min-height: 150px;
+                  "
+                ></div>
+              </div>
+            </div>
+
+            <!-- THREATS -->
+            <div class="column is-6">
+              <div
+                class="box d-flex flex-column h-100"
+                style="min-height: 280px"
+              >
+                <div
+                  class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3"
+                  style="border-color: #334155 !important"
+                >
+                  <h2
+                    class="title is-6 mb-0 d-flex align-items-center gap-2"
+                    style="font-size: 13px"
+                  >
+                    <span
+                      class="p-1 rounded-circle d-inline-block"
+                      style="
+                        width: 8px;
+                        height: 8px;
+                        background-color: var(--bv-red);
+                      "
+                    ></span>
+                    Threats
+                    <span class="has-text-grey font-normal" id="count-Threat"
+                      >(0)</span
+                    >
+                  </h2>
+                  <button
+                    onclick="launchCreationModal('SWOT', 'Threat')"
+                    class="button is-small is-dark py-0 px-2 font-bold"
+                    style="height: 22px; font-size: 11px"
+                  >
+                    +
+                  </button>
+                </div>
+                <div
+                  id="pool-Threat"
+                  data-classification="Threat"
+                  class="d-flex flex-column gap-2 flex-grow-1 p-1 border border-dashed rounded"
+                  style="
+                    border-color: #334155 !important;
+                    background-color: rgba(15, 23, 42, 0.15);
+                    min-height: 150px;
+                  "
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THE PERFORMANCE PIPELINE HORIZONS (40% WIDTH SPLIT / 5 COLS)[cite: 2] -->
+        <div class="column is-5">
+          <div class="box d-flex flex-column h-100">
+            <div class="mb-3">
+              <span
+                class="has-text-success font-bold text-uppercase d-block mb-1"
+                style="font-size: 10px"
+                >Execution Mapping Layer</span
+              >
+              <h2 class="title is-5 mb-0">Three Horizons Project Pipeline</h2>
+            </div>
+
+            <div class="d-flex flex-column gap-3 flex-grow-1">
+              <!-- HORIZON 1 -->
+              <div
+                class="p-3 rounded border-start border-warning border-4 d-flex flex-column"
+                style="background-color: #0f172a; min-height: 140px"
+              >
+                <div
+                  class="d-flex align-items-center justify-content-between mb-2"
+                >
+                  <span
+                    class="font-bold text-uppercase tracking-wide text-warning"
+                    style="font-size: 11px"
+                    >Horizon 1: Core Assets (0-12m) <span id="count-H1"></span
+                  ></span>
+                  <button
+                    onclick="launchCreationModal('Project', 'H1')"
+                    class="button is-small is-dark py-0 px-2 font-bold"
+                    style="height: 20px; font-size: 10px"
+                  >
+                    +
+                  </button>
+                </div>
+                <div
+                  id="pool-H1"
+                  data-classification="H1"
+                  class="d-flex flex-column gap-2 flex-grow-1 p-1 border border-dashed rounded animate-none"
+                  style="
+                    border-color: #334155 !important;
+                    background-color: rgba(30, 41, 59, 0.1);
+                  "
+                ></div>
+              </div>
+
+              <!-- HORIZON 2 -->
+              <div
+                class="p-3 rounded border-start border-4 d-flex flex-column"
+                style="
+                  background-color: #0f172a;
+                  min-height: 140px;
+                  border-left-color: var(--bv-orange) !important;
+                "
+              >
+                <div
+                  class="d-flex align-items-center justify-content-between mb-2"
+                >
+                  <span
+                    class="font-bold text-uppercase tracking-wide"
+                    style="font-size: 11px; color: var(--bv-orange)"
+                    >Horizon 2: Scale Transition (12-36m)
+                    <span id="count-H2"></span
+                  ></span>
+                  <button
+                    onclick="launchCreationModal('Project', 'H2')"
+                    class="button is-small is-dark py-0 px-2 font-bold"
+                    style="height: 20px; font-size: 10px"
+                  >
+                    +
+                  </button>
+                </div>
+                <div
+                  id="pool-H2"
+                  data-classification="H2"
+                  class="d-flex flex-column gap-2 flex-grow-1 p-1 border border-dashed rounded animate-none"
+                  style="
+                    border-color: #334155 !important;
+                    background-color: rgba(30, 41, 59, 0.1);
+                  "
+                ></div>
+              </div>
+
+              <!-- HORIZON 3 -->
+              <div
+                class="p-3 rounded border-start border-4 d-flex flex-column"
+                style="
+                  background-color: #0f172a;
+                  min-height: 140px;
+                  border-left-color: var(--bv-violet) !important;
+                "
+              >
+                <div
+                  class="d-flex align-items-center justify-content-between mb-2"
+                >
+                  <span
+                    class="font-bold text-uppercase tracking-wide"
+                    style="font-size: 11px; color: var(--bv-violet)"
+                    >Horizon 3: Disruptive Systems (36-72m)
+                    <span id="count-H3"></span
+                  ></span>
+                  <button
+                    onclick="launchCreationModal('Project', 'H3')"
+                    class="button is-small is-dark py-0 px-2 font-bold"
+                    style="height: 20px; font-size: 10px"
+                  >
+                    +
+                  </button>
+                </div>
+                <div
+                  id="pool-H3"
+                  data-classification="H3"
+                  class="d-flex flex-column gap-2 flex-grow-1 p-1 border border-dashed rounded animate-none"
+                  style="
+                    border-color: #334155 !important;
+                    background-color: rgba(30, 41, 59, 0.1);
+                  "
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- WORKSPACE OVERLAY POPUPS: DATA ENTRY CREATION DIALOG -->
+    <div id="creation-modal" class="modal">
+      <div class="modal-background" onclick="dismissCreationModal()"></div>
+      <div class="modal-content" style="max-width: 520px">
+        <div class="box">
+          <header
+            class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4"
+            style="border-color: #334155 !important"
+          >
+            <h3
+              class="title is-6 mb-0 text-white font-bold"
+              id="modal-heading-title"
+            >
+              Add Entry
+            </h3>
+            <button
+              class="delete"
+              aria-label="close"
+              onclick="dismissCreationModal()"
+            ></button>
+          </header>
+
+          <div class="field mb-3">
+            <label
+              class="label text-uppercase has-text-grey-light font-bold"
+              style="font-size: 10px"
+              id="lbl-input-label"
+              for="modal-input-label"
+              >Strategic Statement / Title Summary</label
+            >
+            <div class="control">
+              <input
+                type="text"
+                id="modal-input-label"
+                name="modal-input-label"
+                placeholder="Enter headline summary statement..."
+                class="input is-small fw-semibold"
+              />
+            </div>
+          </div>
+
+          <div class="field mb-4">
+            <label
+              class="label text-uppercase has-text-grey-light font-bold"
+              style="font-size: 10px"
+              id="lbl-input-description"
+              for="modal-input-description"
+              >Detailed Context Overview & Performance Metrics</label
+            >
+            <div class="control">
+              <textarea
+                id="modal-input-description"
+                name="modal-input-description"
+                rows="3"
+                placeholder="Paste data logs, regulatory limits or capacity variables..."
+                class="textarea is-small fw-medium"
+              ></textarea>
+            </div>
+          </div>
+
+          <div
+            id="modal-project-attribute-block"
+            class="d-none border-top pt-3 flex-column gap-3 animate-none"
+            style="border-color: #334155 !important"
+          >
+            <div
+              class="text-uppercase tracking-widest has-text-grey font-mono font-bold"
+              style="font-size: 9px"
+            >
+              Execution Portfolio Settings
+            </div>
+            <div class="columns is-variable is-2">
+              <div class="column is-4">
+                <label
+                  class="label has-text-grey font-semibold mb-1"
+                  style="font-size: 9px"
+                  id="lbl-select-investment"
+                  for="modal-select-investment"
+                  >Investment</label
+                >
+                <div class="select is-small is-fullwidth">
+                  <select
+                    id="modal-select-investment"
+                    name="modal-select-investment"
+                  >
+                    <option value="Small Investment">Small Investment</option>
+                    <option value="Medium Investment">Medium Investment</option>
+                    <option value="Large Investment">Large Investment</option>
+                  </select>
+                </div>
+              </div>
+              <div class="column is-4">
+                <label
+                  class="label has-text-grey font-semibold mb-1"
+                  style="font-size: 9px"
+                  id="lbl-select-value"
+                  for="modal-select-value"
+                  >Value Potential</label
+                >
+                <div class="select is-small is-fullwidth">
+                  <select id="modal-select-value" name="modal-select-value">
+                    <option value="Low Value">Low Value</option>
+                    <option value="Medium Value">Medium Value</option>
+                    <option value="High Value">High Value</option>
+                  </select>
+                </div>
+              </div>
+              <div class="column is-4">
+                <label
+                  class="label has-text-grey font-semibold mb-1"
+                  style="font-size: 9px"
+                  id="lbl-select-risk"
+                  for="modal-select-risk"
+                  >Risk Level</label
+                >
+                <div class="select is-small is-fullwidth">
+                  <select id="modal-select-risk" name="modal-select-risk">
+                    <option value="Low Risk">Low Risk</option>
+                    <option value="Medium Risk">Medium Risk</option>
+                    <option value="High Risk">High Risk</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer
+            class="d-flex justify-content-end gap-2 border-top pt-3 mt-4"
+            style="border-color: #334155 !important"
+          >
+            <button
+              class="button is-small is-dark font-bold text-xs text-light"
+              onclick="dismissCreationModal()"
+            >
+              Cancel
+            </button>
+            <button
+              class="button is-small is-success font-bold text-xs"
+              onclick="commitModalNodeCreation()"
+            >
+              Add to Matrix
+            </button>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKSPACE OVERLAY POPUPS: RELATION ENGINE ALIGNMENT MIND MAP (image_c43917.png MATCH)[cite: 1] -->
+    <div id="centerpiece-modal" class="modal">
+      <div class="modal-background" onclick="dismissCenterpieceModal()"></div>
+      <div class="modal-content" style="max-width: 1040px; width: 92vw">
+        <div class="box bv-grid-canvas p-4">
+          <header
+            class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-4"
+            style="border-color: #334155 !important"
+          >
+            <h3
+              class="title is-6 mb-0 font-bold text-white d-flex align-items-center gap-2"
+            >
+              <span class="material-symbols-outlined text-emerald-400"
+                >hub</span
+              >
+              Relational Centerpiece Alignment Map
+            </h3>
+            <button
+              class="delete"
+              aria-label="close"
+              onclick="dismissCenterpieceModal()"
+            ></button>
+          </header>
+
+          <!-- UPPER SECTION LAYOUT SLOT: HIGH FIDELITY HYBRID 3-COLUMN STRUCTURE[cite: 1] -->
+          <div
+            id="mindmap-canvas"
+            class="columns is-variable is-3 p-3 rounded shadow-inner"
+            style="
+              background-color: rgba(15, 23, 42, 0.25);
+              border: 1px solid #334155;
+              min-height: 320px;
+            "
+          ></div>
+
+          <!-- LOWER SECTION LAYOUT SLOT: DEEP DETAILS AND METRICS DOCK WRAPPERS ENTIRELY BELOW MAP[cite: 1] -->
+          <div
+            id="mindmap-metadata-panel"
+            class="p-3 rounded border border-slate-800 shadow mt-4"
+            style="background-color: rgba(15, 23, 42, 0.65)"
+          ></div>
+
+          <footer
+            class="d-flex justify-content-end border-top pt-3 mt-4"
+            style="border-color: #334155 !important"
+          >
+            <button
+              class="button is-small is-dark text-uppercase tracking-wider font-bold"
+              onclick="dismissCenterpieceModal()"
+            >
+              Close Overview ×
+            </button>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // =========================================================================
+      // BLOCK A: STRATEGIC MODEL DEFINITIONS & DATA SEEDS
+      // =========================================================================
+      const TECHNICAL_INSTALLATIONS_SEED_DATA = {
+        strategicScope:
+          "Technical Installations Strategic Growth & Recovery Roadmap 2026",
+        items: [
+          {
+            id: "n1",
+            objectType: "SWOT",
+            classification: "Strength",
+            label:
+              "Proprietary In-House Horizontal Directional Drilling (HDD) Rig Fleet",
+            description:
+              "Owning 3 active drilling rigs plus 1 nanodrill creates an immense barrier to entry, allowing us to deploy complex underground cables with zero reliance on third-party machinery availability.",
+            rank: 0,
+            relationships: ["n22", "n23"],
+          },
+          {
+            id: "n2",
+            objectType: "SWOT",
+            classification: "Strength",
+            label:
+              "Fully Operational Internal Trade Training Center (Vakschool)",
+            description:
+              "Our training infrastructure in Flevoland maintains a capacity of 100 students, enabling rapid cross-qualification and multiskilling of technicians to combat industry-wide labor shortfalls.",
+            rank: 1,
+            relationships: ["n20", "n21"],
+          },
+          {
+            id: "n3",
+            objectType: "SWOT",
+            classification: "Strength",
+            label: "Long-Term Multi-Year Framework Agreements with DSOs",
+            description:
+              "Secured framework configurations extending up to 12 years with major regional grid operators (Liander, Stedin) provide a stable €1.5bn backlog run-rate.",
+            rank: 2,
+            relationships: ["n23"],
+          },
+
+          {
+            id: "n4",
+            objectType: "SWOT",
+            classification: "Weakness",
+            label:
+              "Compressed EBITDA Margins on Basic Electrical Cabling (7-9%)",
+            description:
+              "Commoditized facility electrical installation works operate on extremely low boundaries compared to top-quartile market competitors who average up to 24% margins.",
+            rank: 0,
+            relationships: ["n20", "n22"],
+          },
+          {
+            id: "n5",
+            objectType: "SWOT",
+            classification: "Weakness",
+            label: "Frontline Attrition & Team Burnout Risk (18%)",
+            description:
+              "Frontline technician turnover peaked in 2025 due to prolonged capacity strain, directly impacting our capability to absorb incremental regional delivery requests.",
+            rank: 1,
+            relationships: ["n21"],
+          },
+          {
+            id: "n6",
+            objectType: "SWOT",
+            classification: "Weakness",
+            label: "Legacy Database Debt in Compliancy Reporting Loops",
+            description:
+              "Primary infrastructure testing documentation systems are disconnected, requiring manual entry via engineers and causing workflow friction.",
+            rank: 2,
+            relationships: [],
+          },
+
+          {
+            id: "n10",
+            objectType: "SWOT",
+            classification: "Opportunity",
+            label:
+              "National Net Congestion Crisis Requiring Rapid Substation Ombouw",
+            description:
+              "Grid saturation forces all industrial clients to seek immediate smart-metering, local low-voltage panel monitoring, and structural substation reinforcements.",
+            rank: 0,
+            relationships: ["n22", "n23", "n24"],
+          },
+          {
+            id: "n11",
+            objectType: "SWOT",
+            classification: "Opportunity",
+            label:
+              "Commercialization of Trade School to External Subcontractors",
+            description:
+              "Opening unfilled training slots to corporate partner mechanics can capture premium, high-margin revenue through NEN 3140 and SCIOS certifications.",
+            rank: 1,
+            relationships: ["n20"],
+          },
+          {
+            id: "n12",
+            objectType: "SWOT",
+            classification: "Opportunity",
+            label:
+              "Adjacent Expansion Into On-Site Energy Management Systems (EMS)",
+            description:
+              "Packaging building automation networks alongside mobile battery warehouse assets unlocks access to high-tier advisory framework fees.",
+            rank: 2,
+            relationships: ["n22", "n24"],
+          },
+
+          {
+            id: "n16",
+            objectType: "SWOT",
+            classification: "Threat",
+            label: "Aggressive Subcontractor Price Undercutting by Competitors",
+            description:
+              "Highly agile boutique contractors who ignore safety compliance framework over-structures frequently undercut our bidding lines on generic projects.",
+            rank: 0,
+            relationships: ["n20"],
+          },
+          {
+            id: "n17",
+            objectType: "SWOT",
+            classification: "Threat",
+            label:
+              "Volatile Regional Regulatory Mandates on Solar/PV Infrastructure",
+            description:
+              "Sudden rollbacks on grid solar export subsidies risk causing an immediate retraction in mid-market solar inspection investments.",
+            rank: 1,
+            relationships: [],
+          },
+          {
+            id: "n18",
+            objectType: "SWOT",
+            classification: "Threat",
+            label:
+              "Severe Structural Scarcity of Certified High-Voltage System Engineers",
+            description:
+              "Failure to pipeline advanced installation leads will throttle our Horizon 2 platform transformation schedule completely.",
+            rank: 2,
+            relationships: ["n21", "n23"],
+          },
+
+          {
+            id: "n20",
+            objectType: "Project",
+            classification: "H1",
+            label: "Vakschool Monetization & External Certification Academy",
+            description:
+              "Deploy premium external certification seating (SCIOS Scope 10/12, NEN 3140 safety tracks) to monetize existing internal trade center over-capacities.",
+            rank: 0,
+            investmentRequired: "Small Investment",
+            expectedValue: "High Value",
+            riskLevel: "Low Risk",
+            owner: "Academy Lead",
+            relationships: [],
+          },
+          {
+            id: "n21",
+            objectType: "Project",
+            classification: "H1",
+            label: "Frontline Multiskilling Progression Framework",
+            description:
+              "Implement structured cross-qualifications tracks to transform basic electricians into high-voltage automation supervisors, dropping churn rates.",
+            rank: 1,
+            investmentRequired: "Medium Investment",
+            expectedValue: "High Value",
+            riskLevel: "Low Risk",
+            owner: "HR Director",
+            relationships: [],
+          },
+          {
+            id: "n22",
+            objectType: "Project",
+            classification: "H2",
+            label: "Turnkey Energy Management Systems (EMS) Launch",
+            description:
+              "Combine substation deployment fields with smart digital management interfaces, establishing a high-margin recurring annuity line.",
+            rank: 0,
+            investmentRequired: "Medium Investment",
+            expectedValue: "Medium Value",
+            riskLevel: "Medium Risk",
+            owner: "Product Architect",
+            relationships: [],
+          },
+          {
+            id: "n23",
+            objectType: "Project",
+            classification: "H2",
+            label: "Turnkey Grid-Congestion Support Bundling",
+            description:
+              "Leverage our scarce HDD boorclub fleet to execute combined civil cable paths plus substation technical configurations under a single framework contract.",
+            rank: 1,
+            investmentRequired: "Medium Investment",
+            expectedValue: "High Value",
+            riskLevel: "Medium Risk",
+            owner: "Operations Lead",
+            relationships: [],
+          },
+          {
+            id: "n24",
+            objectType: "Project",
+            classification: "H3",
+            label: "Smart-Grid Advanced Applied Research Joint Venture",
+            description:
+              "Form a co-funded platform consortium with universities and clean-energy producers to pilot next-generation decentralized localized microgrids.",
+            rank: 0,
+            investmentRequired: "Large Investment",
+            expectedValue: "High Value",
+            riskLevel: "High Risk",
+            owner: "Strategy Director",
+            relationships: [],
+          },
+        ],
+      };
+
+      const THEME_ACCENTS = {
+        Strength: {
+          border: "border-start border-4 border-success",
+          bgCircle: "border-success",
+          title: "has-text-success",
+          sub: "AMPLIFIES COHESION",
+        },
+        Weakness: {
+          border: "border-start border-4",
+          bgCircle: "border-rose",
+          title: "has-text-warning",
+          sub: "MITIGATES DRAG",
+        },
+        Opportunity: {
+          border: "border-start border-4 border-info",
+          bgCircle: "border-info",
+          title: "has-text-info",
+          sub: "EXPLOITS OPENING",
+        },
+        Threat: {
+          border: "border-start border-4 border-danger",
+          bgCircle: "border-danger",
+          title: "has-text-danger",
+          sub: "DEFENDS OPERATIONS",
+        },
+        H1: {
+          border: "border-start border-4 border-warning",
+          bgCircle: "border-warning",
+          title: "has-text-warning",
+          sub: "OPTIMIZE CORE",
+        },
+        H2: {
+          border: "border-start border-4",
+          bgCircle: "border-orange",
+          title: "text-orange",
+          sub: "SCALE TRANSITION",
+        },
+        H3: {
+          border: "border-start border-4",
+          bgCircle: "border-violet",
+          title: "text-violet",
+          sub: "SEED DISRUPTIVE",
+        },
+      };
+
+      const ATTR_ICONS = {
+        investmentRequired: {
+          "Small Investment": {
+            text: "signal_cellular_alt_1_bar",
+            color: "has-text-success",
+          },
+          "Medium Investment": {
+            text: "signal_cellular_alt_2_bar",
+            color: "has-text-warning",
+          },
+          "Large Investment": {
+            text: "signal_cellular_alt",
+            color: "has-text-danger",
+          },
+        },
+        expectedValue: {
+          "Low Value": { text: "star_outline", color: "has-text-danger" },
+          "Medium Value": { text: "star_half", color: "has-text-warning" },
+          "High Value": { text: "star", color: "has-text-success" },
+        },
+        riskLevel: {
+          "Low Risk": { text: "do_disturb_on", color: "has-text-success" },
+          "Medium Risk": { text: "error", color: "has-text-warning" },
+          "High Risk": { text: "nearby_error", color: "has-text-danger" },
+        },
+      };
+
+      // =========================================================================
+      // BLOCK B: CORE VIEW RENDERING (SAFE IN-PLACE MANIPULATIONS)
+      // =========================================================================
+      function renderAllInterfaceBuckets() {
+        document.getElementById("strategic-scope-input").value =
+          window.state.strategicScope;
+        const pools = [
+          "Strength",
+          "Weakness",
+          "Opportunity",
+          "Threat",
+          "H1",
+          "H2",
+          "H3",
+        ];
+
+        pools.forEach((pId) => {
+          const container = document.getElementById(`pool-${pId}`);
+          if (!container) return;
+          container.innerHTML = "";
+
+          const filtered = window.state.items
+            .filter((i) => i.classification === pId)
+            .sort((a, b) => a.rank - b.rank);
+
+          filtered.forEach((item) => {
+            const card = createCardElement(item);
+            container.appendChild(card);
+          });
+        });
+        updateDashboardCounters();
+      }
+
+      function createCardElement(item) {
+        const card = document.createElement("div");
+        card.setAttribute("data-id", item.id);
+
+        const isFocus = window.state.selectedNodeId === item.id;
+        const accentStyle = THEME_ACCENTS[item.classification]?.border || "";
+        const focusClass = isFocus ? "active-focus" : "";
+
+        card.className = `strategic-card p-3 rounded-3 d-flex justify-content-between align-items-start gap-3 select-none ${accentStyle} ${focusClass}`;
+
+        card.onclick = (e) => {
+          if (e.target.closest("button") || e.target.closest("select")) return;
+
+          const currentId = card.getAttribute("data-id");
+          if (window.state.selectedNodeId !== currentId) {
+            window.state.selectedNodeId = currentId;
+
+            document.querySelectorAll(".strategic-card").forEach((el) => {
+              el.classList.remove("active-focus");
+              const innerBtn = el.querySelector(".expand-modal-btn");
+              if (innerBtn) innerBtn.classList.add("opacity-0");
+              const innerTa = el.querySelector("textarea");
+              if (innerTa) innerTa.setAttribute("disabled", "true");
+            });
+
+            card.classList.add("active-focus");
+            const innerBtn = card.querySelector(".expand-modal-btn");
+            if (innerBtn) innerBtn.classList.remove("opacity-0");
+
+            saveApplicationState();
+          } else {
+            if (e.target.closest("textarea")) {
+              const innerTa = card.querySelector("textarea");
+              if (innerTa && innerTa.hasAttribute("disabled")) {
+                innerTa.removeAttribute("disabled");
+                innerTa.focus();
+              }
+            }
+          }
+        };
+
+        let badgesRowContent = "";
+        if (item.objectType === "Project") {
+          const iKey = ATTR_ICONS.investmentRequired[item.investmentRequired]
+            ? item.investmentRequired
+            : "Small Investment";
+          const vKey = ATTR_ICONS.expectedValue[item.expectedValue]
+            ? item.expectedValue
+            : "Low Value";
+          const rKey = ATTR_ICONS.riskLevel[item.riskLevel]
+            ? item.riskLevel
+            : "Low Risk";
+
+          const inv = ATTR_ICONS.investmentRequired[iKey];
+          const val = ATTR_ICONS.expectedValue[vKey];
+          const rsk = ATTR_ICONS.riskLevel[rKey];
+
+          badgesRowContent = `
+            <span class="d-flex align-items-center justify-content-center p-1 bg-dark rounded border border-slate-800" style="width:22px; height:22px;" title="${iKey}">
+                <span class="material-symbols-outlined ${inv.color}">${inv.text}</span>
+            </span>
+            <span class="d-flex align-items-center justify-content-center p-1 bg-dark rounded border border-slate-800" style="width:24px; height:24px;" title="${vKey}">
+                <span class="material-symbols-outlined ${val.color}">${val.text}</span>
+            </span>
+            <span class="d-flex align-items-center justify-content-center p-1 bg-dark rounded border border-slate-800" style="width:24px; height:24px;" title="${rKey}">
+                <span class="material-symbols-outlined ${rsk.color}">${rsk.text}</span>
+            </span>
+        `;
+        }
+
+        const expandModalButtonHtml = `
+        <button onclick="event.stopPropagation(); launchCenterpieceModal();" class="expand-modal-btn ${isFocus ? "" : "opacity-0"} button is-xs is-dark border-slate-800 p-1 rounded d-flex align-items-center justify-center shadow-sm" style="width: 24px; height: 24px;" title="Open Connection Matrix Mind Map">
+            <span class="material-symbols-outlined text-info">expand_content</span>
+        </button>
+    `;
+
+        card.innerHTML = `
+        <div class="w-100 pe-2 flex-grow-1">
+            <label for="textarea-${item.id}" class="is-sr-only">Statement Summary Description</label>
+            <textarea id="textarea-${item.id}" name="title-${item.id}" disabled class="bg-transparent border-0 p-0 text-white w-100 fw-semibold text-xs leading-normal disabled:cursor-pointer" rows="1">${item.label}</textarea>
+        </div>
+        
+        <div class="d-flex align-items-center gap-1 shrink-0 select-none">
+            ${badgesRowContent}
+            ${expandModalButtonHtml}
+        </div>
+    `;
+
+        const ta = card.querySelector("textarea");
+        setTimeout(() => {
+          ta.style.height = "auto";
+          ta.style.height = ta.scrollHeight + "px";
+        }, 1);
+
+        ta.oninput = () => {
+          ta.style.height = "auto";
+          ta.style.height = ta.scrollHeight + "px";
+          item.label = ta.value;
+          saveApplicationState();
+        };
+        ta.onblur = () => {
+          ta.setAttribute("disabled", "true");
+          item.label = ta.value.trim() || "Untitled Statement Entry";
+          saveApplicationState();
+        };
+
+        return card;
+      }
+
+      // =========================================================================
+      // BLOCK C: RELATIONAL MIND MAP DIALOG (image_c43917.png LAYOUT ALIGNMENT)[cite: 1]
+      // =========================================================================
+      function launchCenterpieceModal() {
+        renderSpatialCenterpieceCanvas();
+        document.getElementById("centerpiece-modal").classList.add("is-active");
+      }
+
+      function dismissCenterpieceModal() {
+        document
+          .getElementById("centerpiece-modal")
+          .classList.remove("is-active");
+        renderAllInterfaceBuckets();
+      }
+
+      function renderSpatialCenterpieceCanvas() {
+        const canvas = document.getElementById("mindmap-canvas");
+        const metaPanel = document.getElementById("mindmap-metadata-panel");
+        if (!window.state.selectedNodeId || window.state.items.length === 0)
+          return;
+
+        const focusNode = window.state.items.find(
+          (i) => i.id === window.state.selectedNodeId,
+        );
+        if (!focusNode) return;
+
+        const linkedNodes = [];
+        window.state.items.forEach((item) => {
+          if (item.id === focusNode.id) {
+            (item.relationships || []).forEach((targetId) => {
+              const target = window.state.items.find((t) => t.id === targetId);
+              if (target && !linkedNodes.some((x) => x.id === target.id))
+                linkedNodes.push(target);
+            });
+          } else {
+            if ((item.relationships || []).includes(focusNode.id)) {
+              if (!linkedNodes.some((x) => x.id === item.id))
+                linkedNodes.push(item);
+            }
+          }
+        });
+
+        const buckets = {
+          Strength: [],
+          Weakness: [],
+          Opportunity: [],
+          Threat: [],
+          H1: [],
+          H2: [],
+          H3: [],
+        };
+        linkedNodes.forEach((n) => {
+          if (buckets[n.classification]) buckets[n.classification].push(n);
+        });
+
+        const centerColorClass =
+          THEME_ACCENTS[focusNode.classification]?.bgCircle ||
+          "border-secondary";
+
+        const buildCategoryMarkupBlock = (title, key, cssColor) => {
+          const currentLinks = buckets[key] || [];
+          const nonLinkedItems = window.state.items.filter(
+            (i) =>
+              i.id !== focusNode.id &&
+              i.classification === key &&
+              !(focusNode.relationships || []).includes(i.id),
+          );
+          const customVerbPhrase = THEME_ACCENTS[key]?.sub || "INTEGRATES WITH";
+
+          let cardsHtml = currentLinks
+            .map(
+              (n) => `
+            <div class="p-2 bg-dark border border-slate-800 rounded-3 text-center position-relative shadow-sm d-flex flex-column gap-1">
+                <div class="text-uppercase tracking-wider font-mono opacity-50 font-black text-slate-400 mb-0.5" style="font-size: 8px;">${customVerbPhrase}</div>
+                <span class="fw-bold text-light leading-snug">${n.label}</span>
+                <button onclick="severRelationshipLink('${n.id}')" class="delete position-absolute" style="top:-6px; right:-6px; width:14px; height:14px;" title="Sever Link"></button>
+            </div>
+        `,
+            )
+            .join("");
+
+          if (!cardsHtml)
+            cardsHtml = `<div class="has-text-grey italic py-1 text-center font-medium" style="font-size:11px;">No active links mapped.</div>`;
+
+          let addSelectHtml = "";
+          if (nonLinkedItems.length > 0) {
+            addSelectHtml = `
+                <div class="mt-2 pt-1 border-top border-slate-800 d-flex align-items-center gap-1 justify-content-end">
+                    <span class="material-symbols-outlined has-text-grey" style="font-size:12px;">add</span>
+                    <label for="select-add-link-${key}" class="is-sr-only">Link to ${title}</label>
+                    <div class="select is-small">
+                        <select id="select-add-link-${key}" name="select-add-link-${key}" onchange="if(this.value) connectIsolatedRelationshipLink(this.value);" style="font-size: 9px; max-width: 125px; height:24px; padding-top:2px; padding-bottom:2px;">
+                            <option value="">+ Link ${title}...</option>
+                            ${nonLinkedItems.map((i) => `<option value="${i.id}">[${i.id}] ${i.label.substring(0, 30)}...</option>`).join("")}
+                        </select>
+                    </div>
+                </div>
+            `;
+          }
+
+          return `
+            <div class="d-flex flex-column gap-2 p-2.5 rounded border border-slate-800" style="background-color: rgba(15,23,42,0.15);">
+                <div class="font-black text-uppercase tracking-widest ${cssColor} border-bottom border-slate-800 pb-1 d-flex align-items-center justify-content-between" style="font-size:9px; border-color: #334155 !important;">
+                    <span class="has-text-grey font-mono fw-normal">(${currentLinks.length})</span>
+                    <span>${title}</span>
+                </div>
+                <div class="d-flex flex-column gap-1 overflow-auto pr-1" style="max-h: 110px;">
+                    ${cardsHtml}
+                </div>
+                ${addSelectHtml}
+            </div>
+        `;
+        };
+
+        // Columns are fully separated and compliant with image_c43917.png blueprint[cite: 1]
+        canvas.innerHTML = `
+        <!-- COLUMN 1: STRENGTHS & OPPORTUNITIES -->
+        <div class="column is-4 d-flex flex-column gap-3 justify-content-center border-end border-slate-800/50">
+            <div class="text-uppercase tracking-widest has-text-grey fw-bold d-flex align-items-center gap-1" style="font-size:9px;"><span class="material-symbols-outlined text-success">check_circle</span> Capability Framework</div>
+            ${buildCategoryMarkupBlock("STRENGTHS", "Strength", "text-success")}
+            ${buildCategoryMarkupBlock("OPPORTUNITIES", "Opportunity", "has-text-info")}
+        </div>
+
+        <!-- COLUMN 2: FOCUS BLOCK CELL -->
+        <div class="column is-4 d-flex flex-column justify-content-center px-2">
+            <div class="p-4 rounded-4 text-center w-100 shadow bg-dark border border-2 border-slate-700 ${centerColorClass} d-flex flex-col gap-2">
+                <span class="font-mono tracking-widest bg-opacity-50 bg-dark has-text-grey px-2.5 py-0.5 rounded-pill mx-auto font-bold text-uppercase" style="font-size:8px; border:1px solid #334155;">
+                    Focal Entry [${focusNode.id}]
+                </span>
+                <div class="fw-black text-white leading-snug uppercase" style="font-size:12px;">${focusNode.label}</div>
+                <p class="has-text-grey font-medium leading-relaxed border-top border-slate-800 pt-2 mb-0" style="font-size:10px;">${focusNode.description || "No specific annotations logged yet."}</p>
+            </div>
+            
+            <div class="mt-3 p-2.5 bg-dark rounded border border-slate-800 flex flex-column gap-2 shadow-inner">
+                <div class="text-uppercase font-bold has-text-grey text-center block" style="font-size:8px; tracking-wide">Connected Delivery Horizons Matrix</div>
+                <div class="columns is-variable is-1">
+                    <div class="column is-4 px-0.5">${buildCategoryMarkupBlock("H1", "H1", "has-text-warning")}</div>
+                    <div class="column is-4 px-0.5">${buildCategoryMarkupBlock("H2", "H2", "text-orange")}</div>
+                    <div class="column is-4 px-0.5">${buildCategoryMarkupBlock("H3", "H3", "text-violet")}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMN 3: WEAKNESSES & THREATS -->
+        <div class="column is-4 d-flex flex-column gap-3 justify-content-center border-start border-slate-800/50 pl-3">
+            <div class="text-uppercase tracking-widest has-text-grey fw-bold d-flex align-items-center gap-1" style="font-size:9px;"><span class="material-symbols-outlined text-danger">warning</span> Liability & Risk Vectors</div>
+            ${buildCategoryMarkupBlock("WEAKNESSES", "Weakness", "has-text-warning")}
+            ${buildCategoryMarkupBlock("THREATS", "Threat", "text-danger")}
+        </div>
+    `;
+
+        // Metadata form elements rendered entirely below map canvas[cite: 1]
+        metaPanel.innerHTML = `
+        <div class="columns is-variable is-3">
+            <div class="column is-8 d-flex flex-column gap-1.5">
+                <label for="modal-live-desc-textarea" class="text-uppercase tracking-wider has-text-grey font-bold d-flex align-items-center gap-1" style="font-size:9px;">
+                    <span class="material-symbols-outlined">description</span> Active Focus Element Strategy Notes & Project Descriptions
+                </label>
+                <textarea id="modal-live-desc-textarea" name="modal-live-desc-textarea" rows="3" class="textarea is-small leading-relaxed" placeholder="Add modular metrics, action vectors, or capability parameters for this focal node...">${focusNode.description || ""}</textarea>
+            </div>
+            
+            <div class="column is-4 d-flex flex-column gap-2 justify-content-end">
+                ${
+                  focusNode.objectType === "Project"
+                    ? `
+                    <div class="d-flex flex-column gap-2 border-top pt-2" style="border-color: #334155 !important;">
+                        <div>
+                            <label for="modal-live-inv-select" class="text-uppercase tracking-wider has-text-grey font-bold block mb-1" style="font-size:8px;">Investment Tier</label>
+                            <div class="select is-small is-fullwidth">
+                                <select id="modal-live-inv-select" name="modal-live-inv-select">
+                                    <option value="Small Investment" ${focusNode.investmentRequired === "Small Investment" ? "selected" : ""}>Small Investment</option>
+                                    <option value="Medium Investment" ${focusNode.investmentRequired === "Medium Investment" ? "selected" : ""}>Medium Investment</option>
+                                    <option value="Large Investment" ${focusNode.investmentRequired === "Large Investment" ? "selected" : ""}>Large Investment</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="modal-live-val-select" class="text-uppercase tracking-wider has-text-grey font-bold block mb-1" style="font-size:8px;">Value Potential</label>
+                            <div class="select is-small is-fullwidth">
+                                <select id="modal-live-val-select" name="modal-live-val-select">
+                                    <option value="Low Value" ${focusNode.expectedValue === "Low Value" ? "selected" : ""}>Low Value</option>
+                                    <option value="Medium Value" ${focusNode.expectedValue === "Medium Value" ? "selected" : ""}>Medium Value</option>
+                                    <option value="High Value" ${focusNode.expectedValue === "High Value" ? "selected" : ""}>High Value</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="modal-live-rsk-select" class="text-uppercase tracking-wider has-text-grey font-bold block mb-1" style="font-size:8px;">Risk Level</label>
+                            <div class="select is-small is-fullwidth">
+                                <select id="modal-live-rsk-select" name="modal-live-rsk-select">
+                                    <option value="Low Risk" ${focusNode.riskLevel === "Low Risk" ? "selected" : ""}>Low Risk</option>
+                                    <option value="Medium Risk" ${focusNode.riskLevel === "Medium Risk" ? "selected" : ""}>Medium Risk</option>
+                                    <option value="High Risk" ${focusNode.riskLevel === "High Risk" ? "selected" : ""}>High Risk</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `
+                    : `<div class="text-center has-text-grey italic font-medium p-3" style="font-size:11px; margin-top:20px;">SWOT items trace environmental indicators and do not scale execution operational metrics rows.</div>`
+                }
+            </div>
+        </div>
+    `;
+
+        document
+          .getElementById("modal-live-desc-textarea")
+          .addEventListener("input", (e) => {
+            updateDescriptionFieldValue(e.target.value);
+          });
+        if (focusNode.objectType === "Project") {
+          document
+            .getElementById("modal-live-inv-select")
+            .addEventListener("change", (e) => {
+              updateProjectSpecField("investmentRequired", e.target.value);
+            });
+          document
+            .getElementById("modal-live-val-select")
+            .addEventListener("change", (e) => {
+              updateProjectSpecField("expectedValue", e.target.value);
+            });
+          document
+            .getElementById("modal-live-rsk-select")
+            .addEventListener("change", (e) => {
+              updateProjectSpecField("riskLevel", e.target.value);
+            });
+        }
+      }
+
+      // =========================================================================
+      // BLOCK D: UTILITIES & SYSTEM DIALOG CLOSURES
+      // =========================================================================
+      function launchCreationModal(type, classification) {
+        window.activeModalContext = { type, classification };
+        let businessTypeLabel = classification;
+        if (classification === "H1") businessTypeLabel = "Horizon 1 Project";
+        if (classification === "H2") businessTypeLabel = "Horizon 2 Project";
+        if (classification === "H3") businessTypeLabel = "Horizon 3 Project";
+
+        document.getElementById("modal-heading-title").innerText =
+          `Add New ${businessTypeLabel}`;
+        document.getElementById("modal-input-label").value = "";
+        document.getElementById("modal-input-description").value = "";
+
+        document.getElementById("modal-select-investment").value =
+          "Small Investment";
+        document.getElementById("modal-select-value").value = "Low Value";
+        document.getElementById("modal-select-risk").value = "Low Risk";
+
+        const projectBlocks = document.getElementById(
+          "modal-project-attribute-block",
+        );
+        if (type === "Project")
+          projectBlocks.className = "d-flex flex-column gap-2 pt-3 border-top";
+        else projectBlocks.className = "d-none";
+
+        document.getElementById("creation-modal").classList.add("is-active");
+        setTimeout(() => {
+          document.getElementById("modal-input-label").focus();
+        }, 100);
+      }
+
+      function dismissCreationModal() {
+        document.getElementById("creation-modal").classList.remove("is-active");
+        window.activeModalContext = null;
+      }
+
+      function commitModalNodeCreation() {
+        if (!window.activeModalContext) return;
+        const { type, classification } = window.activeModalContext;
+
+        const labelVal = document
+          .getElementById("modal-input-label")
+          .value.trim();
+        const descriptionVal = document
+          .getElementById("modal-input-description")
+          .value.trim();
+
+        if (!labelVal)
+          return alert(
+            "Please provide an executive headline summary before creation.",
+          );
+
+        let maxNum = 0;
+        window.state.items.forEach((i) => {
+          const parsed = parseInt(i.id.replace("n", ""));
+          if (!isNaN(parsed) && parsed > maxNum) maxNum = parsed;
+        });
+        const nextId = `n${maxNum + 1}`;
+        const siblings = window.state.items.filter(
+          (i) => i.classification === classification,
+        ).length;
+
+        const baseObj = {
+          id: nextId,
+          objectType: type,
+          classification: classification,
+          label: labelVal,
+          description: descriptionVal,
+          rank: siblings,
+          relationships: [],
+        };
+
+        if (type === "Project") {
+          baseObj.investmentRequired = document.getElementById(
+            "modal-select-investment",
+          ).value;
+          baseObj.expectedValue =
+            document.getElementById("modal-select-value").value;
+          baseObj.riskLevel =
+            document.getElementById("modal-select-risk").value;
+          baseObj.owner = "Unassigned Lead Core";
+        }
+
+        window.state.items.push(baseObj);
+        window.state.selectedNodeId = nextId;
+
+        saveApplicationState();
+        dismissCreationModal();
+        renderAllInterfaceBuckets();
+      }
+
+      function updateProjectSpecField(field, val) {
+        const focusNode = window.state.items.find(
+          (i) => i.id === window.state.selectedNodeId,
+        );
+        if (focusNode && focusNode.objectType === "Project") {
+          focusNode[field] = val;
+          saveApplicationState();
+        }
+      }
+
+      function connectIsolatedRelationshipLink(targetId) {
+        const focusNode = window.state.items.find(
+          (i) => i.id === window.state.selectedNodeId,
+        );
+        if (!focusNode || !targetId) return;
+        if (!focusNode.relationships) focusNode.relationships = [];
+        if (!focusNode.relationships.includes(targetId))
+          focusNode.relationships.push(targetId);
+        saveApplicationState();
+        renderSpatialCenterpieceCanvas();
+      }
+
+      function severRelationshipLink(targetId) {
+        const focusNode = window.state.items.find(
+          (i) => i.id === window.state.selectedNodeId,
+        );
+        if (!focusNode) return;
+        if (focusNode.relationships)
+          focusNode.relationships = focusNode.relationships.filter(
+            (id) => id !== targetId,
+          );
+        const targetNode = window.state.items.find((i) => i.id === targetId);
+        if (targetNode && targetNode.relationships)
+          targetNode.relationships = targetNode.relationships.filter(
+            (id) => id !== focusNode.id,
+          );
+        saveApplicationState();
+        renderSpatialCenterpieceCanvas();
+      }
+
+      // =========================================================================
+      // BLOCK E: SERIALIZATION LAYER PACKAGING
+      // =========================================================================
+      function exportToCSV() {
+        const headers = [
+          "ID",
+          "Archetype",
+          "Classification",
+          "Rank",
+          "Title",
+          "Description",
+          "Capital_Investment",
+          "Value_Output",
+          "Risk_Tier",
+          "Functional_Owner",
+          "Connected_IDs",
+        ];
+        const entries = [];
+        window.state.items.forEach((item) => {
+          const links = (item.relationships || []).join(" | ");
+          entries.push([
+            item.id,
+            item.objectType,
+            item.classification,
+            item.rank,
+            item.label || "",
+            item.description || "",
+            item.objectType === "Project"
+              ? item.investmentRequired || "Small Investment"
+              : "N/A",
+            item.objectType === "Project"
+              ? item.expectedValue || "Low Value"
+              : "N/A",
+            item.objectType === "Project"
+              ? item.riskLevel || "Low Risk"
+              : "N/A",
+            item.objectType === "Project"
+              ? item.owner || "Unassigned Lead"
+              : "N/A",
+            links,
+          ]);
+        });
+        let dataString =
+          "data:text/csv;charset=utf-8," +
+          headers.map((h) => `"${h.replace(/"/g, '""')}"`).join(",") +
+          "\n";
+        entries.forEach((r) => {
+          dataString +=
+            r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",") +
+            "\n";
+        });
+        const linkHook = document.createElement("a");
+        linkHook.setAttribute("href", encodeURI(dataString));
+        linkHook.setAttribute(
+          "download",
+          `${(window.state.strategicScope || "Strategic_Registry")
+            .trim()
+            .replace(/[^a-z0-9]/gi, "_")
+            .toLowerCase()}_matrix_registry.csv`,
+        );
+        document.body.appendChild(linkHook);
+        linkHook.click();
+        document.body.removeChild(linkHook);
+      }
+
+      function triggerCSVImport() {
+        document.getElementById("csv-file-hook").click();
+      }
+      function handleCSVImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          processSpreadsheetParsing(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+
+      function processSpreadsheetParsing(rawText) {
+        const rows = rawText.split(/\r?\n/);
+        if (rows.length < 2)
+          return alert("Import Terminated: Missing structural row lines maps.");
+        const cleanSplitter = (lineStr) => {
+          let cell = "",
+            parsed = [],
+            inQuotes = false;
+          for (let i = 0; i < lineStr.length; i++) {
+            let char = lineStr.charAt(i);
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === "," && !inQuotes) {
+              parsed.push(cell);
+              cell = "";
+            } else cell += char;
+          }
+          parsed.push(cell);
+          return parsed.map((v) =>
+            v.trim().replace(/^"/, "").replace(/"$/, "").replace(/""/g, '"'),
+          );
+        };
+        const parsedItems = [];
+        for (let i = 1; i < rows.length; i++) {
+          if (!rows[i].trim()) continue;
+          const columns = cleanSplitter(rows[i]);
+          if (columns.length < 5) continue;
+          const item = {
+            id: columns[0],
+            objectType: columns[1],
+            classification: columns[2],
+            rank: parseInt(columns[3]) || 0,
+            label: columns[4],
+            description: columns[5],
+            relationships: [],
+          };
+          if (item.objectType === "Project") {
+            item.investmentRequired =
+              columns[6] !== "N/A" ? columns[6] : "Small Investment";
+            item.expectedValue =
+              columns[7] !== "N/A" ? columns[7] : "Low Value";
+            item.riskLevel = columns[8] !== "N/A" ? columns[8] : "Low Risk";
+            item.owner =
+              columns[9] !== "N/A" ? columns[9] : "Unassigned Lead Core";
+          }
+          if (columns[10])
+            item.relationships = columns[10]
+              .split("|")
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+          parsedItems.push(item);
+        }
+        window.state.items = parsedItems;
+        window.state.selectedNodeId = parsedItems.length
+          ? parsedItems[0].id
+          : null;
+        saveApplicationState();
+        renderAllInterfaceBuckets();
+        alert("Spreadsheet Ingestion Complete.");
+      }
+
+      function clearBoardToBlank() {
+        if (
+          !confirm(
+            "Are you sure you want to completely clear the board? This will wipe all current records and reset the system to an empty configuration.",
+          )
+        )
+          return;
+        window.state = {
+          strategicScope: "New Strategic Architecture Project Portfolio",
+          items: [],
+          selectedNodeId: null,
+        };
+        saveApplicationState();
+        renderAllInterfaceBuckets();
+      }
+    </script>
+  </body>
+</html>
