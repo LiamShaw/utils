@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evaluation with DUSTER</title>
+    <!-- Cross-platform iconography framework -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* ==========================================================================
+           COLOR PALETTE & DESIGN SYSTEM
+           ========================================================================== */
+      :root {
+        --bg-gradient: linear-gradient(135deg, #090d16 0%, #02040a 100%);
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --accent-neon: #10b981;
+        --border-color: #334155;
+        --sub-bg: #0f172a;
+        --thumb-red: #ef4444;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+        color: var(--text-main);
+        line-height: 1.6;
+        padding: 2rem 1rem;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      /* ==========================================================================
+           HEADER & TOOLBAR
+           ========================================================================== */
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        gap: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+      }
+
+      .header-title h1 {
+        font-size: 2.2rem;
+        margin: 0;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .header-title h1 i {
+        background: linear-gradient(to right, #818cf8, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      input[type="text"].state-code {
+        padding: 0.6rem 0.8rem;
+        background: var(--sub-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--accent-neon);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 0.95rem;
+        letter-spacing: 0.1em;
+        text-align: center;
+        width: 110px;
+      }
+      input[type="text"].state-code:focus {
+        outline: none;
+        border-color: var(--accent-neon);
+      }
+
+      .btn {
+        border: none;
+        padding: 0.6rem 1.1rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+      }
+      .btn-neon {
+        background: var(--accent-neon);
+        color: #0f172a;
+      }
+      .btn-neon:hover {
+        background: #12d393;
+        transform: translateY(-1px);
+      }
+      .btn-secondary {
+        background: var(--sub-bg);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+      }
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .btn-icon {
+        padding: 0.6rem 0.8rem;
+        font-size: 1.1rem;
+      }
+
+      /* ==========================================================================
+           PROMINENT PANELS GRID (PRIMARY LAYOUT)
+           ========================================================================== */
+      .primary-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+      @media (min-width: 960px) {
+        .primary-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      /* Spectrum border card wrapper */
+      .section-card {
+        position: relative;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        background-clip: padding-box;
+        border: 2px solid transparent;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .section-card::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          #ec4899,
+          #8b5cf6,
+          #3b82f6,
+          #10b981,
+          #f59e0b,
+          #ec4899
+        );
+        background-size: 400%;
+        border-radius: 18px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+      .section-card:hover::before {
+        opacity: 1;
+        animation: spectrum-shift 12s linear infinite;
+      }
+      .section-card:hover {
+        box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.25);
+      }
+
+      @keyframes spectrum-shift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      h2 {
+        margin-top: 0;
+        color: var(--text-main);
+        font-size: 1.35rem;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      h2 i {
+        color: var(--primary);
+      }
+
+      /* Panel 1: Evaluation Profile */
+      .evaluation-display {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        background: var(--sub-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.25rem;
+      }
+      .evaluation-title {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+      }
+      .evaluation-value {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.1;
+      }
+      .evaluation-value .tshirt {
+        color: var(--text-main);
+      }
+      .evaluation-value .sp {
+        color: var(--accent-neon);
+        font-weight: 600;
+        font-size: 2rem;
+        margin-left: 0.5rem;
+      }
+
+      .chart-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+      }
+
+      /* Panel 2: Parameters */
+      .sliders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      .slider-group {
+        background: var(--sub-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+      }
+
+      .slider-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+      .slider-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-main);
+      }
+      .slider-value {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--primary);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        background: transparent;
+      }
+      input[type="range"]:focus {
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 10px;
+        cursor: pointer;
+        background: var(--border-color);
+        border-radius: 10px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        height: 22px;
+        width: 22px;
+        border-radius: 50%;
+        background: var(--thumb-red);
+        cursor: pointer;
+        -webkit-appearance: none;
+        margin-top: -6px;
+        border: 3px solid #0f172a;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+
+      .ticks {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 6px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      /* ==========================================================================
+           SECONDARY SECTION: DOCUMENTATION
+           ========================================================================== */
+      .doc-section {
+        margin-top: 2rem;
+      }
+      details {
+        margin-bottom: 1rem;
+      }
+      details summary {
+        cursor: pointer;
+        font-weight: 700;
+        color: var(--primary);
+        padding: 0.75rem;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      details summary::-webkit-details-marker {
+        display: none;
+      }
+      details summary::before {
+        content: "\f0da";
+        font-family: "Font Awesome 6 Free";
+      }
+      details[open] summary::before {
+        transform: rotate(90deg);
+      }
+
+      .doc-body {
+        background: var(--sub-bg);
+        border: 1px solid var(--border-color);
+        border-top: none;
+        padding: 1.25rem;
+        border-radius: 0 0 10px 10px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+      .doc-body strong {
+        color: var(--text-main);
+      }
+
+      /* ==========================================================================
+           CONFIGURATION MODAL (MATCHING IMAGE 2)
+           ========================================================================== */
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(2, 4, 10, 0.85);
+        backdrop-filter: blur(5px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .modal-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 2rem;
+        width: 90%;
+        max-width: 650px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        position: relative;
+      }
+
+      .config-option-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 0;
+        border-bottom: 1px dashed var(--border-color);
+      }
+      .config-label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 1rem;
+      }
+      .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+      .radio-group input[type="radio"] {
+        accent-color: var(--primary);
+      }
+
+      /* T-Shirt Spectrum Bar in Config */
+      .spectrum-bar-container {
+        margin-top: 1.5rem;
+        background: var(--sub-bg);
+        padding: 1.25rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+      }
+      .spectrum-bar {
+        height: 20px;
+        border-radius: 10px;
+        display: flex;
+        overflow: hidden;
+        margin: 1rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .spectrum-seg {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: bold;
+        color: #000;
+      }
+      .seg-xs {
+        background: #facc15;
+        width: 10%;
+      }
+      .seg-s {
+        background: #16a34a;
+        width: 15%;
+        color: #fff;
+      }
+      .seg-m {
+        background: #f97316;
+        width: 20%;
+        color: #fff;
+      }
+      .seg-l {
+        background: #ec4899;
+        width: 20%;
+        color: #fff;
+      }
+      .seg-xl {
+        background: #9333ea;
+        width: 18%;
+        color: #fff;
+      }
+      .seg-xxl {
+        background: #dc2626;
+        width: 17%;
+        color: #fff;
+      }
+
+      .tshirt-ranges-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+      }
+      .version-stamp {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      /* Toast Modal */
+      .toast-modal {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--card-bg);
+        color: var(--text-main);
+        border: 2px solid var(--accent-neon);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transform: translateY(100px);
+        opacity: 0;
+        transition:
+          transform 0.3s ease,
+          opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .toast-modal.active {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER & MAIN TOOLBAR -->
+      <header>
+        <div class="header-title">
+          <h1>
+            <i class="fa-solid fa-chart-radar"></i> Evaluation with DUSTER
+          </h1>
+        </div>
+        <div class="toolbar">
+          <input
+            type="text"
+            id="stateCode"
+            class="state-code"
+            value="000030"
+            maxlength="6"
+          />
+          <button id="btnSet" class="btn btn-primary">
+            <i class="fa-solid fa-check"></i> Set
+          </button>
+          <button id="btnCopy" class="btn btn-neon">
+            <i class="fa-solid fa-copy"></i> Copy
+          </button>
+          <button
+            id="btnReset"
+            class="btn btn-secondary btn-icon"
+            title="Reset"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+          <button
+            id="btnSettings"
+            class="btn btn-secondary btn-icon"
+            title="Configuration Menu"
+          >
+            <i class="fa-solid fa-gear"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- PRIMARY VIEWPORT GRID: THE TWO PROMINENT PANELS -->
+      <main class="primary-grid">
+        <!-- PANEL 1: EVALUATION PROFILE -->
+        <section class="section-card">
+          <h2>
+            <i class="fa-solid fa-square-poll-vertical"></i> Evaluation Profile
+          </h2>
+
+          <div class="evaluation-display">
+            <div class="evaluation-title">Calculated Complexity</div>
+            <div class="evaluation-value">
+              <span class="tshirt" id="tshirtLabel">M</span>
+              <span class="sp" id="spContainer"
+                >(<span id="spLabel">8</span> SP)</span
+              >
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="radarChart" width="380" height="380"></canvas>
+          </div>
+        </section>
+
+        <!-- PANEL 2: DUSTER PARAMETERS -->
+        <section class="section-card">
+          <h2><i class="fa-solid fa-sliders"></i> DUSTER Parameters</h2>
+
+          <div class="sliders-list">
+            <!-- Dev -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">D: Development Complexity</span>
+                <span class="slider-value" id="valLabel-dev">Trivial</span>
+              </div>
+              <input
+                type="range"
+                id="slider-dev"
+                min="0"
+                max="3"
+                value="0"
+                step="1"
+              />
+              <div class="ticks">
+                <span>Trivial</span><span>Simple</span><span>Medium</span
+                ><span>Complex</span>
+              </div>
+            </div>
+
+            <!-- Uncertainty -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">U: Uncertainty</span>
+                <span class="slider-value" id="valLabel-uncertainty">Low</span>
+              </div>
+              <input
+                type="range"
+                id="slider-uncertainty"
+                min="0"
+                max="3"
+                value="0"
+                step="1"
+              />
+              <div class="ticks">
+                <span>Low</span><span>Medium</span><span>High</span
+                ><span>Total</span>
+              </div>
+            </div>
+
+            <!-- Scope -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">S: Scope</span>
+                <span class="slider-value" id="valLabel-scope">Small</span>
+              </div>
+              <input
+                type="range"
+                id="slider-scope"
+                min="0"
+                max="3"
+                value="0"
+                step="1"
+              />
+              <div class="ticks">
+                <span>Small</span><span>Medium</span><span>Large</span
+                ><span>Huge</span>
+              </div>
+            </div>
+
+            <!-- Test -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">T: Test Complexity</span>
+                <span class="slider-value" id="valLabel-test">Trivial</span>
+              </div>
+              <input
+                type="range"
+                id="slider-test"
+                min="0"
+                max="3"
+                value="0"
+                step="1"
+              />
+              <div class="ticks">
+                <span>Trivial</span><span>Simple</span><span>Medium</span
+                ><span>Complex</span>
+              </div>
+            </div>
+
+            <!-- Effort -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">E: Effort</span>
+                <span class="slider-value" id="valLabel-effort">Big</span>
+              </div>
+              <input
+                type="range"
+                id="slider-effort"
+                min="0"
+                max="4"
+                value="3"
+                step="1"
+              />
+              <div class="ticks">
+                <span>Light</span><span>Small</span><span>Medium</span
+                ><span>Big</span><span>Unknown</span>
+              </div>
+            </div>
+
+            <!-- Risk -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-title">R: Risk</span>
+                <span class="slider-value" id="valLabel-risk">None</span>
+              </div>
+              <input
+                type="range"
+                id="slider-risk"
+                min="0"
+                max="3"
+                value="0"
+                step="1"
+              />
+              <div class="ticks">
+                <span>None</span><span>Low</span><span>Medium</span
+                ><span>High</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- SECONDARY SECTION: DOCUMENTATION & EXAMPLES -->
+      <section class="doc-section">
+        <details>
+          <summary>DUSTER Methodology Overview</summary>
+          <div class="doc-body">
+            <p>
+              <strong>DUSTER</strong> is a tool developed to help teams improve
+              story point estimations based on CURSE by Bill DeVoe. By splitting
+              complexity into Development and Testing facets, teams uncover
+              realistic hidden work.
+            </p>
+            <ul>
+              <li>
+                <strong>D - Development Complexity:</strong> How intricate or
+                involved the coding work is.
+              </li>
+              <li>
+                <strong>U - Uncertainty:</strong> Certainty or lack thereof
+                regarding tech or architecture.
+              </li>
+              <li>
+                <strong>S - Scope:</strong> Breadth and reach of requested
+                changes.
+              </li>
+              <li>
+                <strong>T - Test Complexity:</strong> Workload and integration
+                complexity for verification.
+              </li>
+              <li>
+                <strong>E - Effort:</strong> Execution time typically associated
+                with points.
+              </li>
+              <li>
+                <strong>R - Risk:</strong> Potential production or architectural
+                danger.
+              </li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Real-World Scenario Examples</summary>
+          <div class="doc-body">
+            <p>
+              <strong>Example 1: Dropping a DB Column</strong><br />
+              Low complexity, scope, and effort, but <em>High Risk</em> (could
+              break production). Results in higher story points.
+            </p>
+            <p>
+              <strong>Example 2: Manual Data Migration</strong><br />
+              Moving 5,000 records manually has low complexity and uncertainty,
+              but <em>High Effort and Risk</em>. Results in a large point
+              estimate.
+            </p>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <!-- CONFIGURATION MENU MODAL (MATCHING IMAGE 2) -->
+    <div id="modalConfig" class="modal-backdrop">
+      <div class="modal-card">
+        <h2><i class="fa-solid fa-sliders"></i> Configuration Menu</h2>
+
+        <div style="margin-bottom: 1.5rem">
+          <h3
+            style="
+              font-size: 1.05rem;
+              color: var(--primary);
+              margin-bottom: 0.5rem;
+              font-style: italic;
+            "
+          >
+            Story Point value :
+          </h3>
+
+          <div class="config-option-row">
+            <span class="config-label">Display Story Point value :</span>
+            <div class="radio-group">
+              <label
+                ><input type="radio" name="cfgDisplaySP" value="on" checked />
+                On</label
+              >
+              <label
+                ><input type="radio" name="cfgDisplaySP" value="off" />
+                Off</label
+              >
+            </div>
+          </div>
+
+          <div class="config-option-row">
+            <span class="config-label">Use Fibonacci suite :</span>
+            <div class="radio-group">
+              <label
+                ><input type="radio" name="cfgFibonacci" value="yes" checked />
+                Yes</label
+              >
+              <label
+                ><input type="radio" name="cfgFibonacci" value="no" /> No</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem">
+          <h3
+            style="
+              font-size: 1.05rem;
+              color: var(--primary);
+              margin-bottom: 0.5rem;
+              font-style: italic;
+            "
+          >
+            T-Shirt Size Configuration
+          </h3>
+
+          <div class="spectrum-bar-container">
+            <div class="spectrum-bar">
+              <div class="spectrum-seg seg-xs">XS</div>
+              <div class="spectrum-seg seg-s">S</div>
+              <div class="spectrum-seg seg-m">M</div>
+              <div class="spectrum-seg seg-l">L</div>
+              <div class="spectrum-seg seg-xl">XL</div>
+              <div class="spectrum-seg seg-xxl">XXL</div>
+            </div>
+
+            <div class="tshirt-ranges-grid">
+              <div><strong>XS:</strong> [1 - 3] SP</div>
+              <div><strong>L:</strong> [21 - 55] SP</div>
+              <div><strong>S:</strong> [3 - 8] SP</div>
+              <div><strong>XL:</strong> [55 - 144] SP</div>
+              <div><strong>M:</strong> [8 - 21] SP</div>
+              <div><strong>XXL:</strong> [144 - 377] SP</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <span class="version-stamp">v1.2 - 2026/07/23</span>
+          <button id="btnCloseConfig" class="btn btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast-modal">
+      <i class="fa-solid fa-circle-check" style="color: var(--accent-neon)"></i>
+      <span id="toastMsg">State updated</span>
+    </div>
+
+    <script>
+      // Facets definition
+      const FACETS = {
+        dev: {
+          name: "Development",
+          labels: ["Trivial", "Simple", "Medium", "Complex"],
+          max: 3,
+        },
+        uncertainty: {
+          name: "Uncertainty",
+          labels: ["Low", "Medium", "High", "Total"],
+          max: 3,
+        },
+        scope: {
+          name: "Scope",
+          labels: ["Small", "Medium", "Large", "Huge"],
+          max: 3,
+        },
+        test: {
+          name: "Test",
+          labels: ["Trivial", "Simple", "Medium", "Complex"],
+          max: 3,
+        },
+        effort: {
+          name: "Effort",
+          labels: ["Light", "Small", "Medium", "Big", "Unknown"],
+          max: 4,
+        },
+        risk: {
+          name: "Risk",
+          labels: ["None", "Low", "Medium", "High"],
+          max: 3,
+        },
+      };
+
+      const AXES = [
+        { key: "dev", label: "Development" },
+        { key: "uncertainty", label: "Uncertainty" },
+        { key: "scope", label: "Scope" },
+        { key: "test", label: "Test" },
+        { key: "effort", label: "Effort" },
+        { key: "risk", label: "Risk" },
+      ];
+
+      // Configuration State
+      const config = {
+        displaySP: true,
+        useFibonacci: true,
+      };
+
+      // DOM Elements
+      const els = {
+        sliders: {
+          dev: document.getElementById("slider-dev"),
+          uncertainty: document.getElementById("slider-uncertainty"),
+          scope: document.getElementById("slider-scope"),
+          test: document.getElementById("slider-test"),
+          effort: document.getElementById("slider-effort"),
+          risk: document.getElementById("slider-risk"),
+        },
+        labels: {
+          dev: document.getElementById("valLabel-dev"),
+          uncertainty: document.getElementById("valLabel-uncertainty"),
+          scope: document.getElementById("valLabel-scope"),
+          test: document.getElementById("valLabel-test"),
+          effort: document.getElementById("valLabel-effort"),
+          risk: document.getElementById("valLabel-risk"),
+        },
+        tshirtLabel: document.getElementById("tshirtLabel"),
+        spLabel: document.getElementById("spLabel"),
+        spContainer: document.getElementById("spContainer"),
+        stateCode: document.getElementById("stateCode"),
+        canvas: document.getElementById("radarChart"),
+        modalConfig: document.getElementById("modalConfig"),
+        btnSettings: document.getElementById("btnSettings"),
+        btnCloseConfig: document.getElementById("btnCloseConfig"),
+      };
+
+      const ctx = els.canvas.getContext("2d");
+
+      function getValues() {
+        return {
+          dev: parseInt(els.sliders.dev.value),
+          uncertainty: parseInt(els.sliders.uncertainty.value),
+          scope: parseInt(els.sliders.scope.value),
+          test: parseInt(els.sliders.test.value),
+          effort: parseInt(els.sliders.effort.value),
+          risk: parseInt(els.sliders.risk.value),
+        };
+      }
+
+      function calculatePoints(vals) {
+        const totalScore =
+          vals.dev +
+          vals.uncertainty +
+          vals.scope +
+          vals.test +
+          vals.effort +
+          vals.risk;
+
+        let tshirt = "XS";
+        let sp = 1;
+
+        if (config.useFibonacci) {
+          if (totalScore <= 1) {
+            tshirt = "XS";
+            sp = 1;
+          } else if (totalScore <= 2) {
+            tshirt = "S";
+            sp = 3;
+          } else if (totalScore <= 4) {
+            tshirt = "M";
+            sp = 5;
+          } else if (totalScore <= 6) {
+            tshirt = "M";
+            sp = 8;
+          } else if (totalScore <= 9) {
+            tshirt = "L";
+            sp = 13;
+          } else if (totalScore <= 12) {
+            tshirt = "XL";
+            sp = 21;
+          } else if (totalScore <= 15) {
+            tshirt = "XL";
+            sp = 34;
+          } else {
+            tshirt = "XXL";
+            sp = 55;
+          }
+        } else {
+          // Linear / Standard Point Scale
+          sp = totalScore + 1;
+          if (sp <= 2) tshirt = "XS";
+          else if (sp <= 5) tshirt = "S";
+          else if (sp <= 9) tshirt = "M";
+          else if (sp <= 13) tshirt = "L";
+          else if (sp <= 16) tshirt = "XL";
+          else tshirt = "XXL";
+        }
+
+        return { tshirt, sp };
+      }
+
+      function updateUI() {
+        const vals = getValues();
+
+        // Update Slider Labels
+        Object.keys(FACETS).forEach((k) => {
+          els.labels[k].innerText = FACETS[k].labels[vals[k]];
+        });
+
+        // Calculate and Update Output
+        const { tshirt, sp } = calculatePoints(vals);
+        els.tshirtLabel.innerText = tshirt;
+        els.spLabel.innerText = sp;
+
+        // Handle Display Config
+        els.spContainer.style.display = config.displaySP ? "inline" : "none";
+
+        // Update State Code Input
+        els.stateCode.value = `${vals.dev}${vals.uncertainty}${vals.scope}${vals.test}${vals.effort}${vals.risk}`;
+
+        // Render Radar Chart
+        drawRadarChart(vals);
+      }
+
+      function drawRadarChart(vals) {
+        const w = els.canvas.width;
+        const h = els.canvas.height;
+        const centerX = w / 2;
+        const centerY = h / 2;
+        const radius = 125;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Grid Rings
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 1;
+        for (let r = 1; r <= 4; r++) {
+          ctx.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 2;
+            const x = centerX + (radius / 4) * r * Math.cos(angle);
+            const y = centerY + (radius / 4) * r * Math.sin(angle);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        }
+
+        // Spokes & Labels
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "12px system-ui";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i - Math.PI / 2;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+
+          const lx = centerX + (radius + 28) * Math.cos(angle);
+          const ly = centerY + (radius + 28) * Math.sin(angle);
+          ctx.fillText(AXES[i].label, lx, ly);
+        }
+
+        // Data Polygon
+        const points = AXES.map((axis, i) => {
+          const val = vals[axis.key];
+          const r = radius * (val / FACETS[axis.key].max) * 0.85 + 10;
+          const angle = (Math.PI / 3) * i - Math.PI / 2;
+          return {
+            x: centerX + r * Math.cos(angle),
+            y: centerY + r * Math.sin(angle),
+          };
+        });
+
+        ctx.beginPath();
+        points.forEach((pt, i) => {
+          if (i === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = "rgba(16, 185, 129, 0.45)";
+        ctx.fill();
+        ctx.strokeStyle = "#10b981";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Points
+        points.forEach((pt) => {
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = "#ef4444";
+          ctx.fill();
+        });
+      }
+
+      function showToast(msg) {
+        const toast = document.getElementById("toast");
+        document.getElementById("toastMsg").innerText = msg;
+        toast.classList.add("active");
+        setTimeout(() => toast.classList.remove("active"), 2500);
+      }
+
+      // Event Listeners
+      Object.values(els.sliders).forEach((slider) => {
+        slider.addEventListener("input", updateUI);
+      });
+
+      document.getElementById("btnSet").addEventListener("click", () => {
+        const code = els.stateCode.value.trim();
+        if (/^\d{6}$/.test(code)) {
+          const digits = code.split("").map(Number);
+          els.sliders.dev.value = Math.min(digits[0], FACETS.dev.max);
+          els.sliders.uncertainty.value = Math.min(
+            digits[1],
+            FACETS.uncertainty.max,
+          );
+          els.sliders.scope.value = Math.min(digits[2], FACETS.scope.max);
+          els.sliders.test.value = Math.min(digits[3], FACETS.test.max);
+          els.sliders.effort.value = Math.min(digits[4], FACETS.effort.max);
+          els.sliders.risk.value = Math.min(digits[5], FACETS.risk.max);
+          updateUI();
+          showToast("Parameters set from code!");
+        } else {
+          showToast("Invalid 6-digit state code.");
+        }
+      });
+
+      document.getElementById("btnCopy").addEventListener("click", () => {
+        const { tshirt, sp } = calculatePoints(getValues());
+        const summary = `DUSTER Evaluation: ${tshirt} (${sp} SP) | Code: [${els.stateCode.value}]`;
+        navigator.clipboard.writeText(summary).then(() => {
+          showToast("Evaluation copied to clipboard!");
+        });
+      });
+
+      document.getElementById("btnReset").addEventListener("click", () => {
+        Object.values(els.sliders).forEach((s) => (s.value = 0));
+        updateUI();
+        showToast("Reset all sliders to 0.");
+      });
+
+      // Settings Modal Listeners
+      els.btnSettings.addEventListener("click", () =>
+        els.modalConfig.classList.add("active"),
+      );
+      els.btnCloseConfig.addEventListener("click", () =>
+        els.modalConfig.classList.remove("active"),
+      );
+
+      document.querySelectorAll('input[name="cfgDisplaySP"]').forEach((r) => {
+        r.addEventListener("change", (e) => {
+          config.displaySP = e.target.value === "on";
+          updateUI();
+        });
+      });
+
+      document.querySelectorAll('input[name="cfgFibonacci"]').forEach((r) => {
+        r.addEventListener("change", (e) => {
+          config.useFibonacci = e.target.value === "yes";
+          updateUI();
+        });
+      });
+
+      // Init
+      updateUI();
+    </script>
+  </body>
+</html>
