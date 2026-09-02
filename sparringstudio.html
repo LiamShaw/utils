@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ex Ante | Reflexive Decision Interceptor</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg-gradient: linear-gradient(135deg, #090d16 0%, #02040a 100%);
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --accent-neon: #10b981;
+        --border-color: #334155;
+        --sub-bg: #0f172a;
+        --impact-bg: #090d16;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+        color: var(--text-main);
+        line-height: 1.6;
+        padding: 3rem 1rem;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1050px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+      header h1 {
+        font-size: 2.3rem;
+        margin-bottom: 0.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+      }
+      header h1 i {
+        margin-right: 0.5rem;
+        background: linear-gradient(to right, #818cf8, #10b981);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      header p {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
+      .section-card {
+        position: relative;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 2.2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        background-clip: padding-box;
+        border: 2px solid transparent;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .section-card::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          #ec4899,
+          #8b5cf6,
+          #3b82f6,
+          #10b981,
+          #f59e0b,
+          #ec4899
+        );
+        background-size: 400%;
+        border-radius: 18px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      .section-card:hover::before {
+        opacity: 1;
+        animation: spectrum-shift 12s linear infinite;
+      }
+      .section-card:hover {
+        box-shadow: 0 25px 35px -10px rgba(99, 102, 241, 0.25);
+      }
+
+      @keyframes spectrum-shift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      h2 {
+        margin-top: 0;
+        color: var(--text-main);
+        font-size: 1.35rem;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      h2 i {
+        color: var(--primary);
+      }
+
+      .question-block {
+        margin-bottom: 1.75rem;
+      }
+      .question-block:last-child {
+        margin-bottom: 0;
+      }
+      .question-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 0.35rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .question-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.85rem;
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      @media (min-width: 768px) {
+        .options-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .option-item {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: rgba(15, 23, 42, 0.4);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        position: relative;
+      }
+      .option-item:hover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+      }
+      .option-header-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        gap: 1rem;
+      }
+      .option-title-text {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-main);
+      }
+      .option-item input[type="radio"] {
+        margin-top: 0.25rem;
+        accent-color: var(--primary);
+      }
+      .option-item.selected {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.12);
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--border-color);
+        transition: 0.3s ease;
+        border-radius: 20px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s ease;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--accent-neon);
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+
+      .impact-box {
+        background: var(--impact-bg);
+        border-left: 3px solid var(--accent-neon);
+        padding: 0.75rem 1rem;
+        border-radius: 0 8px 8px 0;
+        font-size: 0.82rem;
+        color: #cbd5e1;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .impact-box strong {
+        color: var(--accent-neon);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+
+      .input-group-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      @media (min-width: 768px) {
+        .input-group-row {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .inline-switcher-info {
+        background: var(--sub-bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+      }
+
+      .quick-switch-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      @media (min-width: 600px) {
+        .quick-switch-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 900px) {
+        .quick-switch-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      .switch-btn {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        justify-content: space-between;
+        box-sizing: border-box;
+      }
+      .switch-btn:hover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.1);
+      }
+      .switch-btn code {
+        font-size: 0.72rem;
+        color: var(--accent-neon);
+        background: #030508;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        align-self: flex-start;
+        margin-top: 0.25rem;
+        font-weight: bold;
+      }
+      .switch-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 0.85rem;
+        background: var(--sub-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+        font-family: inherit;
+      }
+      input[type="text"]:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 85px;
+      }
+
+      .btn-generate {
+        background: var(--accent-neon);
+        color: #0f172a;
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .btn-generate:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+        background: #12d393;
+      }
+      .action-container {
+        text-align: center;
+        margin: 3rem 0;
+      }
+
+      .output-section {
+        background: #070a12;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+        border: 1px solid var(--border-color);
+        margin-top: 2rem;
+      }
+      .output-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .output-header h3 {
+        color: white;
+        margin: 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .btn-copy {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .btn-copy:hover {
+        background: var(--primary-hover);
+      }
+
+      pre {
+        background: #030508;
+        padding: 1.25rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 0;
+        border: 1px solid #1f2937;
+      }
+      code {
+        font-family:
+          "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        font-size: 0.88rem;
+        color: #e2e8f0;
+        white-space: pre-wrap;
+      }
+
+      .toast-modal {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #f8fafc;
+        border: 2px solid var(--accent-neon);
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transform: translateY(100px);
+        opacity: 0;
+        transition:
+          transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+          opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .toast-modal.active {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .toast-modal i {
+        color: var(--accent-neon);
+        font-size: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1><i class="fa-solid fa-comments"></i> Ex Ante Sparring Studio</h1>
+        <p>
+          Configure an intentional cognitive buffer. Build system instructions
+          that force AI models to interrogate your assumptions, goals, and blind
+          spots before taking action.
+        </p>
+      </header>
+
+      <form id="sparringForm">
+        <!-- PART 1: STRATEGIC ANCHOR & LIVING CONTEXT -->
+        <div class="section-card">
+          <h2>
+            <i class="fa-solid fa-anchor"></i> 1. The Strategic Anchor & Living
+            Context
+          </h2>
+
+          <div class="question-block">
+            <div class="question-title">
+              What are you working to advance, defend, or hold true?
+            </div>
+            <div class="question-desc">
+              Dump your primary anchor here. This can be an urgent project
+              milestone, a product goal, a core organizational value, or a
+              personal leadership commitment.
+            </div>
+            <textarea
+              id="strategicAnchorInput"
+              placeholder="e.g., Transitioning our team from reactive ticket-clearing to substantive platform builds, without burning out mid-level engineers or defaulting to endless status alignment syncs..."
+            >
+Protecting team cognitive bandwidth for substantive product craft while hitting Q4 delivery dates. Non-negotiable: radical candor without defensive corporate corporate-speak.</textarea
+            >
+          </div>
+
+          <div class="question-block">
+            <div class="question-title">
+              What tension, trade-off, or uncertainty are you feeling?
+            </div>
+            <div class="question-desc">
+              Where are you unsure? Do you want to open a collaborative
+              discussion rather than mandate an outcome? Where are you tempted
+              to take the easy path?
+            </div>
+            <textarea
+              id="situatedTensionInput"
+              placeholder="e.g., I'm tempted to say 'yes' to a stakeholder request just to avoid friction, even though it will derail our technical schedule. I'm unsure whether to push back hard or co-create a phase-two delivery..."
+            >
+Tempted to schedule cross-functional syncs instead of making clean subtractive calls. Afraid of appearing uncooperative, so I default to polite corporate compromise.</textarea
+            >
+          </div>
+
+          <div class="input-group-row">
+            <div>
+              <div class="question-title">Time Horizon & Pace Constraints</div>
+              <input
+                type="text"
+                id="timeConstraintsInput"
+                value="High immediate deadline pressure (next 3 weeks), but decisions carry 12-month tech debt"
+                placeholder="e.g., Urgent next-week deadline vs. 6-month structural impact..."
+              />
+            </div>
+            <div>
+              <div class="question-title">
+                Who Bears Downstream Consequences?
+              </div>
+              <input
+                type="text"
+                id="downstreamStakeholdersInput"
+                value="Junior frontline engineers who absorb context-switching and unscheduled bugs"
+                placeholder="e.g., Support desk staff, client end-users, environmental partners..."
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- PART 2: SPARRING ARCHETYPE SELECTOR -->
+        <div class="section-card">
+          <h2>
+            <i class="fa-solid fa-user-ninja"></i> 2. Select Your Sparring
+            Archetype
+          </h2>
+          <div class="question-desc" style="margin-bottom: 1rem">
+            Which inquiry style provokes your best thinking? Pick the voice you
+            naturally listen to when you need to be pulled out of default
+            operational habits.
+          </div>
+
+          <div class="options-grid">
+            <div class="option-item selected">
+              <div class="option-header-wrapper">
+                <span class="option-title-text">
+                  <input
+                    type="radio"
+                    name="sparringArchetype"
+                    value="The Comedic Absurdist (Observational Satirist)"
+                    checked
+                  />
+                  The Comedic Absurdist
+                </span>
+              </div>
+              <div class="impact-box">
+                <strong>Approach:</strong> Observational wit, satire, and
+                comedic hyperbole. Ridicules corporate jargon, circular rituals,
+                and self-important bureaucratic posturing.
+              </div>
+            </div>
+
+            <div class="option-item">
+              <div class="option-header-wrapper">
+                <span class="option-title-text">
+                  <input
+                    type="radio"
+                    name="sparringArchetype"
+                    value="The Socratic Provocateur (Assumption Prober)"
+                  />
+                  The Socratic Provocateur
+                </span>
+              </div>
+              <div class="impact-box">
+                <strong>Approach:</strong> Probes unstated assumptions, false
+                binaries, and hidden worldviews. Refuses to give easy answers;
+                asks penetrating, reflective questions.
+              </div>
+            </div>
+
+            <div class="option-item">
+              <div class="option-header-wrapper">
+                <span class="option-title-text">
+                  <input
+                    type="radio"
+                    name="sparringArchetype"
+                    value="The First-Principles Inquisitor (The Relentless Why)"
+                  />
+                  The First-Principles Inquisitor
+                </span>
+              </div>
+              <div class="impact-box">
+                <strong>Approach:</strong> Strips away corporate rationalization
+                through a relentless series of simple "Why?" questions until the
+                foundational human driver is laid bare.
+              </div>
+            </div>
+
+            <div class="option-item">
+              <div class="option-header-wrapper">
+                <span class="option-title-text">
+                  <input
+                    type="radio"
+                    name="sparringArchetype"
+                    value="The Operational Realist (The Hard COO)"
+                  />
+                  The Operational Realist
+                </span>
+              </div>
+              <div class="impact-box">
+                <strong>Approach:</strong> A battle-hardened assessment of
+                execution capacity, team exhaustion, calendar drain, and
+                concrete ownership.
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Switcher Tags -->
+          <div class="inline-switcher-info" style="margin-top: 1.5rem">
+            <span
+              class="question-title"
+              style="font-size: 0.95rem; margin-bottom: 0.5rem"
+            >
+              <i class="fa-solid fa-bolt" style="color: var(--accent-neon)"></i>
+              Mid-Session Archetype Switchers
+            </span>
+            <div class="question-desc">
+              Paste these tags into your ongoing chat to instantly swap the
+              sparring voice:
+            </div>
+            <div class="quick-switch-grid">
+              <div
+                class="switch-btn"
+                onclick="copySwitchTag('[VOICE: COMEDIC]')"
+              >
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >Comedic</span
+                  >
+                  <span class="switch-desc">Satirical puncture.</span>
+                </div>
+                <code>[VOICE: COMEDIC]</code>
+              </div>
+              <div
+                class="switch-btn"
+                onclick="copySwitchTag('[VOICE: SOCRATIC]')"
+              >
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >Socratic</span
+                  >
+                  <span class="switch-desc">Assumption questioning.</span>
+                </div>
+                <code>[VOICE: SOCRATIC]</code>
+              </div>
+              <div
+                class="switch-btn"
+                onclick="copySwitchTag('[VOICE: FIRST_PRINCIPLES]')"
+              >
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >First-Principles</span
+                  >
+                  <span class="switch-desc">Relentless "Why?" loop.</span>
+                </div>
+                <code>[VOICE: FIRST_PRINCIPLES]</code>
+              </div>
+              <div
+                class="switch-btn"
+                onclick="copySwitchTag('[VOICE: REALIST]')"
+              >
+                <div>
+                  <span
+                    style="
+                      display: block;
+                      margin-bottom: 0.15rem;
+                      font-weight: 700;
+                    "
+                    >Realist</span
+                  >
+                  <span class="switch-desc">Capacity & execution debt.</span>
+                </div>
+                <code>[VOICE: REALIST]</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PART 3: REFLEXIVE FRICTION & INTERVENTION RULES -->
+        <div class="section-card">
+          <h2>
+            <i class="fa-solid fa-sliders"></i> 3. Cognitive Friction &
+            Interruption Protocol
+          </h2>
+
+          <div class="question-block">
+            <div class="question-title">Intervention Friction Level</div>
+            <div class="question-desc">
+              How vigorously should the AI interrupt your default execution
+              flow?
+            </div>
+
+            <div class="options-grid">
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text">
+                    <input
+                      type="radio"
+                      name="frictionLevel"
+                      value="Tier 1: Reflective Pause"
+                    />
+                    Tier 1: Reflective Pause
+                  </span>
+                </div>
+                <div class="impact-box">
+                  <strong>Protocol:</strong> Evaluates the draft against your
+                  anchor and prints two targeted clarifying questions directly
+                  above a revised draft.
+                </div>
+              </div>
+
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text">
+                    <input
+                      type="radio"
+                      name="frictionLevel"
+                      value="Tier 2: The Sparring Arena"
+                      checked
+                    />
+                    Tier 2: The Sparring Arena
+                  </span>
+                </div>
+                <div class="impact-box">
+                  <strong>Protocol:</strong> Refuses to rewrite the text until
+                  it has questioned your motives, tested your tension, and
+                  checked downstream impact.
+                </div>
+              </div>
+
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text">
+                    <input
+                      type="radio"
+                      name="frictionLevel"
+                      value="Tier 3: Radical Subtraction & Puncture"
+                    />
+                    Tier 3: Radical Subtraction
+                  </span>
+                </div>
+                <div class="impact-box">
+                  <strong>Protocol:</strong> Relentlessly strips corporate
+                  padding, questions why this cannot simply be deleted, and
+                  evaluates the "Option Zero" (do nothing).
+                </div>
+              </div>
+
+              <div class="option-item">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text">
+                    <input
+                      type="radio"
+                      name="frictionLevel"
+                      value="Tier 4: Dialectical Mirror"
+                    />
+                    Tier 4: Dialectical Mirror
+                  </span>
+                </div>
+                <div class="impact-box">
+                  <strong>Protocol:</strong> Restructures the communication as
+                  an exploratory dialogue with your team rather than a top-down
+                  mandate.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="question-block" style="margin-top: 1.5rem">
+            <div class="question-title">
+              Non-Negotiable Behavioral Guardrails
+            </div>
+            <div class="options-grid">
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Ban Sycophantic Validation</span
+                  >
+                  <label class="switch"
+                    ><input type="checkbox" id="guardNoPraise" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Rule:</strong> Absolute ban on opening pleasantries
+                  ("Great idea!", "This makes sense!"). Jump straight to
+                  critical reflection.
+                </div>
+              </div>
+
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Enforce Plain Language Puncture</span
+                  >
+                  <label class="switch"
+                    ><input type="checkbox" id="guardJargon" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Rule:</strong> Strip corporate clichés (synergy,
+                  bandwidth, touch base, align, leverage) and replace them with
+                  concrete, grounded nouns and verbs.
+                </div>
+              </div>
+
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Downstream Stakeholder Check</span
+                  >
+                  <label class="switch"
+                    ><input
+                      type="checkbox"
+                      id="guardStakeholder"
+                      checked /><span class="slider"></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Rule:</strong> Always evaluate the hidden cost
+                  shouldered by the people who have no seat at this decision
+                  table.
+                </div>
+              </div>
+
+              <div class="option-item selected">
+                <div class="option-header-wrapper">
+                  <span class="option-title-text"
+                    >Mandatory 'Option Zero' Audit</span
+                  >
+                  <label class="switch"
+                    ><input type="checkbox" id="guardOptionZero" checked /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="impact-box">
+                  <strong>Rule:</strong> Formulate what happens if you take no
+                  action, send no email, or cancel the proposed initiative
+                  entirely.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-container">
+          <button
+            type="button"
+            class="btn-generate"
+            onclick="compileExAnteEngine()"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Compile Sparring
+            Blueprint
+          </button>
+        </div>
+      </form>
+
+      <!-- UNIFIED OUTPUT CONSOLE -->
+      <div class="output-section">
+        <div class="output-header">
+          <h3>
+            <i class="fa-solid fa-terminal"></i> Compiled Ex Ante Instruction
+            Layer
+          </h3>
+          <button class="btn-copy" onclick="copyConfigContent()">
+            <i class="fa-solid fa-copy"></i> Copy System Payload
+          </button>
+        </div>
+        <p
+          style="
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: -0.5rem;
+            margin-bottom: 1.5rem;
+          "
+        >
+          Paste this payload directly into the system instructions of Copilot
+          Studio, ChatGPT Custom GPTs, Claude Projects, or local LLM tools.
+        </p>
+        <pre><code id="tunerOutputDisplay">Click generate to compile your personalized Ex Ante system parameters...</code></pre>
+      </div>
+    </div>
+
+    <div id="toastNotification" class="toast-modal">
+      <i class="fa-solid fa-circle-check"></i>
+      <span id="toastMessage">Instruction payload copied to clipboard</span>
+    </div>
+
+    <script>
+      function showModalAlert(textString) {
+        const toast = document.getElementById("toastNotification");
+        const message = document.getElementById("toastMessage");
+        message.innerText = textString;
+        toast.classList.add("active");
+        setTimeout(() => {
+          toast.classList.remove("active");
+        }, 2800);
+      }
+
+      function refreshSelectionStyles() {
+        document
+          .querySelectorAll('.option-item input[type="radio"]')
+          .forEach((radio) => {
+            const wrapper = radio.closest(".option-item");
+            if (radio.checked) wrapper.classList.add("selected");
+            else wrapper.classList.remove("selected");
+          });
+        document
+          .querySelectorAll('.option-item input[type="checkbox"]')
+          .forEach((cb) => {
+            const wrapper = cb.closest(".option-item");
+            if (cb.checked) wrapper.classList.add("selected");
+            else wrapper.classList.remove("selected");
+          });
+      }
+
+      document.querySelectorAll(".option-item input").forEach((input) => {
+        input.addEventListener("change", function () {
+          if (this.type === "radio") {
+            document
+              .querySelectorAll(`input[name="${this.name}"]`)
+              .forEach((r) => {
+                r.closest(".option-item").classList.remove("selected");
+              });
+          }
+          refreshSelectionStyles();
+        });
+      });
+
+      document.querySelectorAll(".option-item").forEach((item) => {
+        item.addEventListener("click", function (e) {
+          if (
+            e.target.tagName !== "INPUT" &&
+            e.target.tagName !== "LABEL" &&
+            !e.target.classList.contains("slider")
+          ) {
+            const input = this.querySelector("input");
+            if (input) {
+              if (input.type === "checkbox") {
+                input.checked = !input.checked;
+              } else if (input.type === "radio") {
+                input.checked = true;
+                document
+                  .querySelectorAll(`input[name="${input.name}"]`)
+                  .forEach((r) => {
+                    if (r !== input)
+                      r.closest(".option-item").classList.remove("selected");
+                  });
+              }
+              input.dispatchEvent(new Event("change"));
+            }
+          }
+        });
+      });
+
+      function compileExAnteEngine() {
+        const activeArchetype = document.querySelector(
+          'input[name="sparringArchetype"]:checked',
+        ).value;
+        const activeFriction = document.querySelector(
+          'input[name="frictionLevel"]:checked',
+        ).value;
+        const strategicAnchor =
+          document.getElementById("strategicAnchorInput").value.trim() ||
+          "Not specified";
+        const situatedTension =
+          document.getElementById("situatedTensionInput").value.trim() ||
+          "Not specified";
+        const timeConstraints =
+          document.getElementById("timeConstraintsInput").value.trim() ||
+          "Not specified";
+        const downstreamStakeholders =
+          document.getElementById("downstreamStakeholdersInput").value.trim() ||
+          "Not specified";
+
+        const banPraise = document.getElementById("guardNoPraise").checked;
+        const punctureJargon = document.getElementById("guardJargon").checked;
+        const auditStakeholder =
+          document.getElementById("guardStakeholder").checked;
+        const offerOptionZero =
+          document.getElementById("guardOptionZero").checked;
+
+        const behavioralDirectives = [];
+        if (banPraise)
+          behavioralDirectives.push(
+            "Zero Sycophancy (No flattering or generic pleasantries)",
+          );
+        if (punctureJargon)
+          behavioralDirectives.push(
+            "Plain Language Enforcement (Puncture corporate buzzwords)",
+          );
+        if (auditStakeholder)
+          behavioralDirectives.push(
+            "Silent Stakeholder Audit (Assess downstream burden)",
+          );
+        if (offerOptionZero)
+          behavioralDirectives.push(
+            "Option Zero Exploration (State the consequences of no action)",
+          );
+
+        const schemaPayload = {
+          system_name: "Project Ex Ante: Reflexive Decision Sparring Layer",
+          version: "2.0-Situational-Craft",
+          strategic_context: {
+            core_anchor: strategicAnchor,
+            unresolved_tension: situatedTension,
+            time_horizon: timeConstraints,
+            vulnerable_stakeholders: downstreamStakeholders,
+          },
+          interaction_configuration: {
+            active_sparring_voice: activeArchetype,
+            friction_tier: activeFriction,
+            mandatory_checks: behavioralDirectives,
+          },
+        };
+
+        let outputPrompt = `=== SYSTEM INSTRUCTION LAYER: ARCHITECTURE CONFIGURATION (JSON) ===\n`;
+        outputPrompt += `\`\`\`json\n${JSON.stringify(schemaPayload, null, 2)}\n\`\`\`\n\n`;
+
+        outputPrompt += `=== SYSTEM INSTRUCTION LAYER: OPERATIONAL DIRECTIVES ===\n\n`;
+        outputPrompt += `## 1. Core Mandate & Primary Stance\n`;
+        outputPrompt += `You are "Project Ex Ante," a dedicated reflexive sparring partner designed to cultivate slow management and managerial craft. You DO NOT exist to passively execute tasks, rubber-stamp drafts, or celebrate superficial speed. Your purpose is to introduce an intentional reflective pause into the user's day-to-day work before action is taken.\n\n`;
+        outputPrompt += `When the user inputs a draft (email, memo, strategic decision, policy, agenda), do not just fix the grammar. Interrogate the decision through the user's core anchor and situated tensions.\n\n`;
+
+        outputPrompt += `## 2. The User's Living Anchor & Context\n`;
+        outputPrompt += `* **Primary Anchor (Goal, Value, or Craft Boundary):** "${strategicAnchor}"\n`;
+        outputPrompt += `* **Active Tension / Uncertainty / Temptation:** "${situatedTension}"\n`;
+        outputPrompt += `* **Time Horizon & Pacing:** "${timeConstraints}"\n`;
+        outputPrompt += `* **Downstream Stakeholders to Protect:** "${downstreamStakeholders}"\n\n`;
+
+        outputPrompt += `## 3. Active Sparring Voice: [${activeArchetype}]\n`;
+        if (activeArchetype.includes("Comedic Absurdist")) {
+          outputPrompt += `* **Demeanor:** Satirical, sharp, observational, and dryly humorous. Puncture bureaucratic pretension and inflated corporate solemnity by pushing the logic of the action to its humorous extreme.\n`;
+          outputPrompt += `* **Signature Inquiry:** "What are we actually doing here? Are we solving a genuine problem, or are we organizing an elaborate performance of busywork?"\n`;
+        } else if (activeArchetype.includes("Socratic Provocateur")) {
+          outputPrompt += `* **Demeanor:** Quietly penetrating, philosophically rigorous, and patient. Focus on unexamined premises, false dilemmas, and the human situation behind the numbers. Do not lecture; ask 2-3 destabilizing questions.\n`;
+          outputPrompt += `* **Signature Inquiry:** "What assumption must be true for this action to make sense, and what reality does that assumption force you to ignore?"\n`;
+        } else if (activeArchetype.includes("First-Principles")) {
+          outputPrompt += `* **Demeanor:** Utterly straightforward, curious, and relentless. Strip away rationalizations with fundamental "Why?" questions until the underlying human driver is clear.\n`;
+          outputPrompt += `* **Signature Inquiry:** "Why this? Why now? What happens to the world if you just don't do it?"\n`;
+        } else {
+          outputPrompt += `* **Demeanor:** Pragmatic, battle-hardened Chief Operating Officer. Focused on execution debt, cognitive bandwidth, and realistic capacity.\n`;
+          outputPrompt += `* **Signature Inquiry:** "Who actually carries this sack of rocks on Monday morning, and what existing priority gets dropped?"\n`;
+        }
+
+        outputPrompt += `\n## 4. Response Protocol (${activeFriction})\n`;
+        outputPrompt += `Structure your response in three distinct phases:\n`;
+        outputPrompt += `1. **The Sparring Mirror:** Speak directly in character as the chosen archetype. Interrogate how the proposed action aligns with or betrays the Primary Anchor, and challenge the Active Tension.\n`;
+        outputPrompt += `2. **The Grounded Audit:**\n`;
+        outputPrompt += `   * *Anchor Alignment Check:* Highlight where this action advances the anchor vs. where it is a defensive compromise.\n`;
+        if (auditStakeholder) {
+          outputPrompt += `   * *Stakeholder Impact:* Explicitly assess the burden placed on "${downstreamStakeholders}".\n`;
+        }
+        if (offerOptionZero) {
+          outputPrompt += `   * *Option Zero:* Detail what occurs if the user takes no action or deletes the draft entirely.\n`;
+        }
+        outputPrompt += `3. **The Refined Alternative:** Provide a stripped-down, authentic revision that maintains plain speech, eliminates administrative posturing, and honors the core anchor.\n\n`;
+
+        outputPrompt += `## 5. Behavioral Guardrails\n`;
+        if (banPraise)
+          outputPrompt += `* **Zero Praise Ban:** NEVER begin with affirmations or pleasantries ("Good draft!", "Certainly, I can help!"). Jump straight to substantive inquiry.\n`;
+        if (punctureJargon)
+          outputPrompt += `* **Jargon Neutralization:** Purge terms like synergy, bandwidth, leverage, touch base, and alignment. Replace with direct verbs.\n`;
+        outputPrompt += `* **Dynamic Voice Switching:** If the user sends \`[VOICE: COMEDIC]\`, \`[VOICE: SOCRATIC]\`, \`[VOICE: FIRST_PRINCIPLES]\`, or \`[VOICE: REALIST]\`, immediately shift your sparring style without breaking character.`;
+
+        document.getElementById("tunerOutputDisplay").innerText = outputPrompt;
+      }
+
+      function copyConfigContent() {
+        const display = document.getElementById("tunerOutputDisplay").innerText;
+        navigator.clipboard
+          .writeText(display)
+          .then(() => {
+            showModalAlert("Ex Ante blueprint copied to clipboard.");
+          })
+          .catch((err) => {
+            console.error("Clipboard copy failed:", err);
+          });
+      }
+
+      function copySwitchTag(tagString) {
+        navigator.clipboard
+          .writeText(tagString)
+          .then(() => {
+            showModalAlert(`Copied voice tag: ${tagString}`);
+          })
+          .catch((err) => {
+            console.error("Clipboard copy failed:", err);
+          });
+      }
+
+      window.onload = function () {
+        refreshSelectionStyles();
+        compileExAnteEngine();
+      };
+    </script>
+  </body>
+</html>

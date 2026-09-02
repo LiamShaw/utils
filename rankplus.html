@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strategic SWOT & Horizon Matrix Engine</title>
+    <!-- Tailwind CSS for Advanced Layout & Interface Configurations -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- SortableJS for Fluid Handle-Driven Vertical Drag Reordering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+    <!-- Google Material Symbols Outlined Font Sheet Integration -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        :root {
+            --bv-green: #018945;
+            --bv-rose: #e6aaa0;
+            --bv-blue: #6ea0dd;
+            --bv-red: #e14b28;
+            --bv-yellow: #f0aa00;
+            --bv-orange: #e67e22;
+            --bv-violet: #8e44ad;
+        }
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bv-green);
+        }
+        /* Clean Tech-Grid Canvas Backdrop Overlay Structure */
+        .bv-grid-canvas {
+            background-size: 24px 24px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+        }
+        textarea {
+            resize: none;
+        }
+        /* Material symbols icon size adjustment alignment rule */
+        .material-symbols-outlined {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen antialiased flex flex-col relative">
+
+    <!-- MASTER NAVBAR HEADER SYSTEM -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 p-4 sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <a href="logo.svg" target="_blank" class="shrink-0 flex items-center group transition" title="Open Core Logo Source Asset">
+                    <img src="logo.svg" alt="Baas Verkley Logo" class="h-6 w-auto object-contain group-hover:opacity-80 transition" onerror="this.style.display='none'; document.getElementById('logo-fallback-text').classList.remove('hidden');" />
+                    <span id="logo-fallback-text" class="hidden text-white font-black tracking-tighter text-sm uppercase">Baas Verkley</span>
+                </a>
+                <div class="h-5 w-px bg-slate-800 hidden sm:block"></div>
+                <span class="text-xs font-bold tracking-wider text-slate-400 hidden sm:block uppercase">SWOT & Horizon Matrix Engine</span>
+            </div>
+
+            <!-- EXPORT/IMPORT MECHANICS -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <button onclick="triggerCSVImport()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-3 py-1.5 text-xs rounded-md transition shadow-sm cursor-pointer">Import CSV</button>
+                <input type="file" id="csv-file-hook" class="hidden" accept=".csv" onchange="handleCSVImport(event)" />
+                <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-3 py-1.5 text-xs rounded-md transition shadow-sm cursor-pointer">Export Excel Matrix</button>
+                <div class="h-5 w-px bg-slate-800 mx-1"></div>
+                <button onclick="clearBoardToBlank()" class="bg-red-950/40 border border-red-900/60 hover:bg-red-900/30 hover:border-red-700 text-red-400 font-bold px-3 py-1.5 text-xs rounded-md transition shadow-sm cursor-pointer">Clear Board ↺</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- LIVE-EDITABLE STRATEGIC SCOPE BANNER -->
+    <div class="max-w-7xl mx-auto w-full px-4 lg:px-8 pt-6">
+        <div class="bg-slate-800/40 border border-slate-800 p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md">
+            <div class="w-full md:max-w-xl lg:max-w-2xl">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1">Active Strategic Scope (Click to Edit)</label>
+                <input type="text" id="strategic-scope-input" onchange="updateStrategicScope(this.value)" class="bg-transparent text-lg font-extrabold text-white focus:text-[#6ea0dd] focus:outline-none w-full border-b border-transparent hover:border-slate-700 focus:border-[#6ea0dd] transition-colors py-0.5" value="" />
+            </div>
+            <div class="text-left md:text-right hidden sm:block shrink-0">
+                <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Business Unit Focus</span>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Technical Installations Strategy</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID CANVAS SLOTS - ASYMMETRIC 60/40 ASYMMETRIC GRID COLUMN RATIO -->
+    <main class="max-w-7xl mx-auto w-full p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-5 gap-8 flex-1">
+        
+        <!-- COLUMN 1 & 2: SWOT GRID QUADRANT (60% WIDTH / COLS 1-3) -->
+        <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 h-fit">
+            
+            <!-- STRENGTHS -->
+            <div class="bg-slate-800/70 p-4 rounded-xl border border-slate-800 flex flex-col shadow-md min-h-[260px]">
+                <h2 class="text-white font-bold tracking-wide text-xs flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                    <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#018945]"></span> Strengths <span class="text-[10px] font-normal text-slate-400">(Internal Assets)</span> <span class="text-slate-500 font-normal" id="count-Strength">(0)</span></span>
+                    <button onclick="launchCreationModal('SWOT', 'Strength')" class="text-[11px] bg-slate-900 hover:bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-slate-300 font-semibold transition">+</button>
+                </h2>
+                <div id="pool-Strength" data-classification="Strength" class="space-y-2 flex-1 p-1 bg-slate-900/20 rounded-lg border border-dashed border-slate-800/60 min-h-[140px]"></div>
+            </div>
+
+            <!-- WEAKNESSES -->
+            <div class="bg-slate-800/70 p-4 rounded-xl border border-slate-800 flex flex-col shadow-md min-h-[260px]">
+                <h2 class="text-white font-bold tracking-wide text-xs flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                    <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#e6aaa0]"></span> Weaknesses <span class="text-[10px] font-normal text-slate-400">(Internal Liabilities)</span> <span class="text-slate-500 font-normal" id="count-Weakness">(0)</span></span>
+                    <button onclick="launchCreationModal('SWOT', 'Weakness')" class="text-[11px] bg-slate-900 hover:bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-slate-300 font-semibold transition">+</button>
+                </h2>
+                <div id="pool-Weakness" data-classification="Weakness" class="space-y-2 flex-1 p-1 bg-slate-900/20 rounded-lg border border-dashed border-slate-800/60 min-h-[140px]"></div>
+            </div>
+
+            <!-- OPPORTUNITIES -->
+            <div class="bg-slate-800/70 p-4 rounded-xl border border-slate-800 flex flex-col shadow-md min-h-[260px]">
+                <h2 class="text-white font-bold tracking-wide text-xs flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                    <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#6ea0dd]"></span> Opportunities <span class="text-[10px] font-normal text-slate-400">(External Market)</span> <span class="text-slate-500 font-normal" id="count-Opportunity">(0)</span></span>
+                    <button onclick="launchCreationModal('SWOT', 'Opportunity')" class="text-[11px] bg-slate-900 hover:bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-slate-300 font-semibold transition">+</button>
+                </h2>
+                <div id="pool-Opportunity" data-classification="Opportunity" class="space-y-2 flex-1 p-1 bg-slate-900/20 rounded-lg border border-dashed border-slate-800/60 min-h-[140px]"></div>
+            </div>
+
+            <!-- THREATS -->
+            <div class="bg-slate-800/70 p-4 rounded-xl border border-slate-800 flex flex-col shadow-md min-h-[260px]">
+                <h2 class="text-white font-bold tracking-wide text-xs flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                    <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-[#e14b28]"></span> Threats <span class="text-[10px] font-normal text-slate-400">(External Risks)</span> <span class="text-slate-500 font-normal" id="count-Threat">(0)</span></span>
+                    <button onclick="launchCreationModal('SWOT', 'Threat')" class="text-[11px] bg-slate-900 hover:bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-slate-300 font-semibold transition">+</button>
+                </h2>
+                <div id="pool-Threat" data-classification="Threat" class="space-y-2 flex-1 p-1 bg-slate-900/20 rounded-lg border border-dashed border-slate-800/60 min-h-[140px]"></div>
+            </div>
+        </div>
+
+        <!-- COLUMN 3: HORIZON PIPELINES (40% WIDTH / COLS 4-5) -->
+        <div class="lg:col-span-2 space-y-4 flex flex-col">
+            <div class="bg-slate-800/70 p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col gap-4 flex-1">
+                <div>
+                    <span class="text-[#018945] font-bold uppercase tracking-wider text-[10px] block mb-1">Execution Mapping Layer</span>
+                    <h2 class="text-white font-bold tracking-wide text-sm">Three Horizons Project Pipeline</h2>
+                </div>
+
+                <!-- HORIZON 1 PIPELINE BLOCK -->
+                <div class="p-4 bg-slate-900 rounded-xl border-l-4 border-[#f0aa00] shadow-md flex flex-col min-h-[160px]">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-[#f0aa00] uppercase tracking-wide">Horizon 1: Core Assets (0-12m) <span id="count-H1"></span></span>
+                        <button onclick="launchCreationModal('Project', 'H1')" class="text-[10px] bg-slate-800 hover:bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 font-bold">+</button>
+                    </div>
+                    <div id="pool-H1" data-classification="H1" class="space-y-2 flex-1 p-1 bg-slate-800/10 rounded-md border border-dashed border-slate-800 min-h-[60px]"></div>
+                </div>
+
+                <!-- HORIZON 2 PIPELINE BLOCK -->
+                <div class="p-4 bg-slate-900 rounded-xl border-l-4 border-[#e67e22] shadow-md flex flex-col min-h-[160px]">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-[#e67e22] uppercase tracking-wide">Horizon 2: Scale Transition (12-36m) <span id="count-H2"></span></span>
+                        <button onclick="launchCreationModal('Project', 'H2')" class="text-[10px] bg-slate-800 hover:bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 font-bold">+</button>
+                    </div>
+                    <div id="pool-H2" data-classification="H2" class="space-y-2 flex-1 p-1 bg-slate-800/10 rounded-md border border-dashed border-slate-800 min-h-[60px]"></div>
+                </div>
+
+                <!-- HORIZON 3 PIPELINE BLOCK -->
+                <div class="p-4 bg-slate-900 rounded-xl border-l-4 border-[#8e44ad] shadow-md flex flex-col min-h-[160px]">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-[#8e44ad] uppercase tracking-wide">Horizon 3: Disruptive Systems (36-72m) <span id="count-H3"></span></span>
+                        <button onclick="launchCreationModal('Project', 'H3')" class="text-[10px] bg-slate-800 hover:bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 font-bold">+</button>
+                    </div>
+                    <div id="pool-H3" data-classification="H3" class="space-y-2 flex-1 p-1 bg-slate-800/10 rounded-md border border-dashed border-slate-800 min-h-[60px]"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER GUIDELINE NOTES -->
+    <footer class="max-w-7xl mx-auto w-full px-4 lg:px-8 pb-8">
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3.5 text-center text-xs text-slate-400 font-medium shadow-sm">
+            <span class="text-slate-300 font-bold">Interactivity Workflow:</span> Click any block element to select it and activate whole-card drag-and-drop actions. Clicking an already active element lets you perform inline text edits. Use the persistent <span class="px-1 py-0.5 bg-slate-800 text-emerald-400 rounded font-bold font-mono">+</span> icon button to expand into the centerpiece modal.
+        </div>
+    </footer>
+
+    <!-- WORKSPACE A: STRATEGIC RECORD WORKFLOW MODAL -->
+    <div id="creation-modal-backdrop" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" onclick="if(event.target.id==='creation-modal-backdrop') dismissCreationModal()">
+        <div class="bg-slate-900 border border-slate-800 shadow-2xl rounded-xl p-6 max-w-lg w-full flex flex-col gap-4" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <h3 id="modal-heading-title" class="text-white font-bold text-sm tracking-wide">Add Entry</h3>
+                <button onclick="dismissCreationModal()" class="text-slate-500 hover:text-slate-300 font-bold text-lg cursor-pointer">×</button>
+            </div>
+            
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Strategic Statement / Title Summary</label>
+                <input type="text" id="modal-input-label" placeholder="Enter headline summary statement..." class="w-full bg-slate-950 border border-slate-800 rounded-md p-2.5 text-xs text-slate-100 focus:outline-none focus:border-slate-600 font-semibold" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Detailed Context Overview & Performance Metrics</label>
+                <textarea id="modal-input-description" rows="3" placeholder="Paste data logs, regulatory limits, financial thresholds or resource details..." class="w-full bg-slate-950 border border-slate-800 rounded-md p-2.5 text-xs text-slate-300 focus:outline-none focus:border-slate-600 font-medium leading-relaxed"></textarea>
+            </div>
+
+            <div id="modal-project-attribute-block" class="hidden border-t border-slate-800/80 pt-3 flex flex-col gap-3">
+                <div class="text-[9px] font-bold uppercase text-slate-500 tracking-widest">Execution Portfolio Settings</div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] font-semibold text-slate-400">Investment</label>
+                        <select id="modal-select-investment" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-[10px] font-medium text-slate-200 focus:outline-none">
+                            <option value="Small Investment">Small Investment</option>
+                            <option value="Medium Investment">Medium Investment</option>
+                            <option value="Large Investment">Large Investment</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] font-semibold text-slate-400">Value Potential</label>
+                        <select id="modal-select-value" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-[10px] font-medium text-slate-200 focus:outline-none">
+                            <option value="Low Value">Low Value</option>
+                            <option value="Medium Value">Medium Value</option>
+                            <option value="High Value">High Value</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] font-semibold text-slate-400">Risk Level</label>
+                        <select id="modal-select-risk" class="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-[10px] font-medium text-slate-200 focus:outline-none">
+                            <option value="Low Risk">Low Risk</option>
+                            <option value="Medium Risk">Medium Risk</option>
+                            <option value="High Risk">High Risk</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 border-t border-slate-800 pt-3 mt-1">
+                <button onclick="dismissCreationModal()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer">Cancel</button>
+                <button onclick="commitModalNodeCreation()" class="px-3 py-1.5 rounded bg-[#018945] hover:bg-emerald-700 text-white font-bold text-xs transition shadow cursor-pointer">Add to Matrix</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKSPACE B: STRATEGIC ALIGNMENT ENGINE MODAL OVERLAY (image_c43917.png MATCH) -->
+    <div id="centerpiece-modal-backdrop" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 z-50" onclick="handleBackdropDismissal(event)">
+        <div class="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl p-6 max-w-5xl w-full flex flex-col relative bv-grid-canvas max-h-[95vh] overflow-y-auto gap-6" onclick="event.stopPropagation()">
+            
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-white font-bold text-xs tracking-wide uppercase flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-400 animate-pulse">hub</span> Relational Centerpiece Alignment Map
+                </h3>
+                <button onclick="dismissCenterpieceModal()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white px-3 py-1.5 font-bold text-xs uppercase tracking-wider rounded-md transition shadow-md cursor-pointer">Close Overview ×</button>
+            </div>
+
+            <!-- UPPER LAYER: HIGH-FIDELITY 3-COLUMN SPATIAL MIND MAP VISUALS (image_c43917.png) -->
+            <div id="mindmap-canvas" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center relative bg-slate-950/25 p-4 rounded-xl border border-slate-800/50 shadow-inner">
+                <!-- Controlled programmatically via state engines -->
+            </div>
+
+            <!-- LOWER LAYER: CONTEXT FIELDS & METRICS DOCK (image_c43917.png) -->
+            <div id="mindmap-metadata-panel" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950/60 p-5 rounded-xl border border-slate-800 shadow-md">
+                <!-- Injected programmatically below the mind map visuals structure -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN ENGINE UTILITIES SCRIPT MODULE -->
+    <script>
+        const TECHNICAL_INSTALLATIONS_SEED_DATA = {
+            "strategicScope": "Technical Installations Strategic Growth & Recovery Roadmap 2026",
+            "items": [
+                { "id": "n1", "objectType": "SWOT", "classification": "Strength", "label": "Proprietary In-House Horizontal Directional Drilling (HDD) Rig Fleet", "description": "Owning 3 active drilling rigs plus 1 nanodrill creates an immense barrier to entry, allowing us to deploy complex underground cables with zero reliance on third-party machinery availability.", "rank": 0, "relationships": ["n22", "n23"] },
+                { "id": "n2", "objectType": "SWOT", "classification": "Strength", "label": "Fully Operational Internal Trade Training Center (Vakschool)", "description": "Our training infrastructure in Flevoland maintains a capacity of 100 students, enabling rapid cross-qualification and multiskilling of technicians to combat industry-wide labor shortfalls.", "rank": 1, "relationships": ["n20", "n21"] },
+                { "id": "n3", "objectType": "SWOT", "classification": "Strength", "label": "Long-Term Multi-Year Framework Agreements with DSOs", "description": "Secured framework configurations extending up to 12 years with major regional grid operators (Liander, Stedin) provide a stable €1.5bn backlog run-rate.", "rank": 2, "relationships": ["n23"] },
+                
+                { "id": "n4", "objectType": "SWOT", "classification": "Weakness", "label": "Compressed EBITDA Margins on Basic Electrical Cabling (7-9%)", "description": "Commoditized facility electrical installation works operate on extremely low boundaries compared to top-quartile market competitors who average up to 24% margins.", "rank": 0, "relationships": ["n20", "n22"] },
+                { "id": "n5", "objectType": "SWOT", "classification": "Weakness", "label": "Frontline Attrition & Team Burnout Risk (18%)", "description": "Frontline technician turnover peaked in 2025 due to prolonged capacity strain, directly impacting our capability to absorb incremental regional delivery requests.", "rank": 1, "relationships": ["n21"] },
+                { "id": "n6", "objectType": "SWOT", "classification": "Weakness", "label": "Legacy Database Debt in Compliancy Reporting Loops", "description": "Primary infrastructure testing documentation systems are disconnected, requiring manual entry via engineers and causing workflow friction.", "rank": 2, "relationships": [] },
+
+                { "id": "n10", "objectType": "SWOT", "classification": "Opportunity", "label": "National Net Congestion Crisis Requiring Rapid Substation Ombouw", "description": "Grid saturation forces all industrial clients to seek immediate smart-metering, local low-voltage panel monitoring, and structural substation reinforcements.", "rank": 0, "relationships": ["n22", "n23", "n24"] },
+                { "id": "n11", "objectType": "SWOT", "classification": "Opportunity", "label": "Commercialization of Trade School to External Subcontractors", "description": "Opening unfilled training slots to corporate partner mechanics can capture premium, high-margin revenue through NEN 3140 and SCIOS certifications.", "rank": 1, "relationships": ["n20"] },
+                { "id": "n12", "objectType": "SWOT", "classification": "Opportunity", "label": "Adjacent Expansion Into On-Site Energy Management Systems (EMS)", "description": "Packaging building automation networks alongside mobile battery warehouse assets unlocks access to high-tier advisory framework fees.", "rank": 2, "relationships": ["n22", "n24"] },
+
+                { "id": "n16", "objectType": "SWOT", "classification": "Threat", "label": "Aggressive Subcontractor Price Undercutting by Competitors", "description": "Highly agile boutique contractors who ignore safety compliance framework over-structures frequently undercut our bidding lines on generic projects.", "rank": 0, "relationships": ["n20"] },
+                { "id": "n17", "objectType": "SWOT", "classification": "Threat", "label": "Volatile Regional Regulatory Mandates on Solar/PV Infrastructure", "description": "Sudden rollbacks on grid solar export subsidies risk causing an immediate retraction in mid-market solar inspection investments.", "rank": 1, "relationships": [] },
+                { "id": "n18", "objectType": "SWOT", "classification": "Threat", "label": "Severe Structural Scarcity of Certified High-Voltage System Engineers", "description": "Failure to pipeline advanced installation leads will throttle our Horizon 2 platform transformation schedule completely.", "rank": 2, "relationships": ["n21", "n23"] },
+
+                { "id": "n20", "objectType": "Project", "classification": "H1", "label": "Vakschool Monetization & External Certification Academy", "description": "Deploy premium external certification seating (SCIOS Scope 10/12, NEN 3140 safety tracks) to monetize existing internal trade center over-capacities.", "rank": 0, "investmentRequired": "Small Investment", "expectedValue": "High Value", "riskLevel": "Low Risk", "owner": "Academy Lead", "relationships": [] },
+                { "id": "n21", "objectType": "Project", "classification": "H1", "label": "Frontline Multiskilling Progression Framework", "description": "Implement structured cross-qualifications tracks to transform basic electricians into high-voltage automation supervisors, dropping churn rates.", "rank": 1, "investmentRequired": "Medium Investment", "expectedValue": "High Value", "riskLevel": "Low Risk", "owner": "HR Director", "relationships": [] },
+                { "id": "n22", "objectType": "Project", "classification": "H2", "label": "Turnkey Energy Management Systems (EMS) Launch", "description": "Combine substation deployment fields with smart digital management interfaces, establishing a high-margin recurring annuity line.", "rank": 0, "investmentRequired": "Medium Investment", "expectedValue": "Medium Value", "riskLevel": "Medium Risk", "owner": "Product Architect", "relationships": [] },
+                { "id": "n23", "objectType": "Project", "classification": "H2", "label": "Turnkey Grid-Congestion Support Bundling", "description": "Leverage our scarce HDD boorclub fleet to execute combined civil cable paths plus substation technical configurations under a single framework contract.", "rank": 1, "investmentRequired": "Medium Investment", "expectedValue": "High Value", "riskLevel": "Medium Risk", "owner": "Operations Lead", "relationships": [] },
+                { "id": "n24", "objectType": "Project", "classification": "H3", "label": "Smart-Grid Advanced Applied Research Joint Venture", "description": "Form a co-funded platform consortium with universities and clean-energy producers to pilot next-generation decentralized localized microgrids.", "rank": 0, "investmentRequired": "Large Investment", "expectedValue": "High Value", "riskLevel": "High Risk", "owner": "Strategy Director", "relationships": [] }
+            ]
+        };
+
+        const THEME_ACCENTS = {
+            'Strength': { border: 'border-l-4 border-[#018945]', bgCircle: 'border-[#018945] ring-[#018945]/20', title: 'text-[#018945]' },
+            'Weakness': { border: 'border-l-4 border-[#e6aaa0]', bgCircle: 'border-[#e6aaa0] ring-[#e6aaa0]/20', title: 'text-[#e6aaa0]' },
+            'Opportunity': { border: 'border-l-4 border-[#6ea0dd]', bgCircle: 'border-[#6ea0dd] ring-[#6ea0dd]/20', title: 'text-[#6ea0dd]' },
+            'Threat': { border: 'border-l-4 border-[#e14b28]', bgCircle: 'border-[#e14b28] ring-[#e14b28]/20', title: 'text-[#e14b28]' },
+            'H1': { border: 'border-l-4 border-[#f0aa00]', bgCircle: 'border-[#f0aa00] ring-[#f0aa00]/20', title: 'text-[#f0aa00]' },
+            'H2': { border: 'border-l-4 border-[#e67e22]', bgCircle: 'border-[#e67e22] ring-[#e67e22]/20', title: 'text-[#e67e22]' },
+            'H3': { border: 'border-l-4 border-[#8e44ad]', bgCircle: 'border-[#8e44ad] ring-[#8e44ad]/20', title: 'text-[#8e44ad]' }
+        };
+
+        const ATTR_ICONS = {
+            investmentRequired: {
+                'Small Investment': { text: 'signal_cellular_alt_1_bar', color: 'text-emerald-400' },
+                'Medium Investment': { text: 'signal_cellular_alt_2_bar', color: 'text-amber-400' },
+                'Large Investment': { text: 'signal_cellular_alt', color: 'text-red-500' }
+            },
+            expectedValue: {
+                'Low Value': { text: 'star_outline', color: 'text-red-500' },
+                'Medium Value': { text: 'star_half', color: 'text-amber-400' },
+                'High Value': { text: 'star', color: 'text-emerald-400' }
+            },
+            riskLevel: {
+                'Low Risk': { text: 'do_disturb_on', color: 'text-emerald-400' },
+                'Medium Risk': { text: 'error', color: 'text-amber-400' },
+                'High Risk': { text: 'nearby_error', color: 'text-red-500' }
+            }
+        };
+
+        window.state = { strategicScope: "", items: [], selectedNodeId: null };
+        window.activeModalContext = null;
+
+        function loadApplicationState() {
+            const memory = localStorage.getItem('matrix_engine_flat_state');
+            if (memory) {
+                try { window.state = JSON.parse(memory); } catch(e) { window.state = JSON.parse(JSON.stringify(TECHNICAL_INSTALLATIONS_SEED_DATA)); }
+            } else {
+                window.state = JSON.parse(JSON.stringify(TECHNICAL_INSTALLATIONS_SEED_DATA));
+            }
+            if (!window.state.selectedNodeId && window.state.items.length > 0) {
+                window.state.selectedNodeId = window.state.items[0].id;
+            }
+            renderAllInterfaceBuckets();
+        }
+
+        function saveApplicationState() {
+            localStorage.setItem('matrix_engine_flat_state', JSON.stringify(window.state));
+        }
+
+        function configureSortablePools() {
+            const pools = ['Strength', 'Weakness', 'Opportunity', 'Threat', 'H1', 'H2', 'H3'];
+            pools.forEach(pId => {
+                const container = document.getElementById(`pool-${pId}`);
+                if (!container) return;
+                Sortable.create(container, {
+                    group: ['Strength', 'Weakness', 'Opportunity', 'Threat'].includes(pId) ? 'swot-pool' : 'horizon-pool',
+                    animation: 150,
+                    ghostClass: 'bg-slate-950',
+                    onEnd: () => { recalculateFlatIndexRanks(); }
+                });
+            });
+        }
+
+        function recalculateFlatIndexRanks() {
+            const pools = ['Strength', 'Weakness', 'Opportunity', 'Threat', 'H1', 'H2', 'H3'];
+            pools.forEach(pId => {
+                const container = document.getElementById(`pool-${pId}`);
+                const DOMCards = container.querySelectorAll('[data-id]');
+                DOMCards.forEach((card, index) => {
+                    const targetId = card.getAttribute('data-id');
+                    const targetItem = window.state.items.find(i => i.id === targetId);
+                    if (targetItem) {
+                        targetItem.classification = pId;
+                        targetItem.rank = index;
+                        targetItem.objectType = ['Strength', 'Weakness', 'Opportunity', 'Threat'].includes(pId) ? 'SWOT' : 'Project';
+                    }
+                });
+            });
+            saveApplicationState();
+            updateDashboardCounters();
+        }
+
+        function renderAllInterfaceBuckets() {
+            document.getElementById('strategic-scope-input').value = window.state.strategicScope;
+            const pools = ['Strength', 'Weakness', 'Opportunity', 'Threat', 'H1', 'H2', 'H3'];
+            
+            pools.forEach(pId => {
+                const container = document.getElementById(`pool-${pId}`);
+                if (!container) return;
+                container.innerHTML = '';
+
+                const filtered = window.state.items
+                    .filter(i => i.classification === pId)
+                    .sort((a, b) => a.rank - b.rank);
+
+                filtered.forEach(item => {
+                    const card = createCardElement(item);
+                    container.appendChild(card);
+                });
+            });
+
+            updateDashboardCounters();
+        }
+
+        function updateDashboardCounters() {
+            ['Strength', 'Weakness', 'Opportunity', 'Threat', 'H1', 'H2', 'H3'].forEach(pId => {
+                const total = window.state.items.filter(i => i.classification === pId).length;
+                const hook = document.getElementById(`count-${pId}`);
+                if (hook) hook.innerText = `(${total})`;
+            });
+        }
+
+        // STATE MACHINE INTERACTION REFACTOR (HANDLE DECOUPLED)
+        function createCardElement(item) {
+            const card = document.createElement('div');
+            card.setAttribute('data-id', item.id);
+            
+            const isFocus = window.state.selectedNodeId === item.id;
+            const accentStyle = THEME_ACCENTS[item.classification]?.border || '';
+            const focusStyle = isFocus ? 'ring-2 ring-slate-400 bg-slate-850 border-slate-700 shadow-md' : 'hover:bg-slate-850/50';
+
+            card.className = `group relative p-3 bg-slate-900 border border-slate-800 rounded-lg text-xs flex flex-col gap-1.5 cursor-pointer transition select-none ${accentStyle} ${focusStyle}`;
+            
+            card.onclick = (e) => {
+                if (e.target.closest('button')) return;
+                
+                if (window.state.selectedNodeId !== item.id) {
+                    // First Click Handler Matrix Rule: Select/Highlight Card Node
+                    selectFocusNode(item.id);
+                } else {
+                    // Second Click Handler Matrix Rule: Direct text edit activation
+                    const innerTa = card.querySelector('textarea');
+                    if (innerTa && innerTa.hasAttribute('disabled')) {
+                        innerTa.removeAttribute('disabled');
+                        innerTa.focus();
+                    }
+                }
+            };
+
+            let metricsSubRowMarkup = '';
+            if (item.objectType === 'Project') {
+                const iKey = ATTR_ICONS.investmentRequired[item.investmentRequired] ? item.investmentRequired : 'Small Investment';
+                const vKey = ATTR_ICONS.expectedValue[item.expectedValue] ? item.expectedValue : 'Low Value';
+                const rKey = ATTR_ICONS.riskLevel[item.riskLevel] ? item.riskLevel : 'Low Risk';
+
+                const inv = ATTR_ICONS.investmentRequired[iKey];
+                const val = ATTR_ICONS.expectedValue[vKey];
+                const rsk = ATTR_ICONS.riskLevel[rKey];
+
+                metricsSubRowMarkup = `
+                    <div class="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-400 font-medium mt-0.5 pointer-events-none">
+                        <span class="flex items-center gap-1 px-1 py-0.2 bg-slate-950 border border-slate-850 rounded">
+                            <span class="material-symbols-outlined ${inv.color}">${inv.text}</span>
+                        </span>
+                        <span class="flex items-center gap-1 px-1 py-0.2 bg-slate-950 border border-slate-850 rounded">
+                            <span class="material-symbols-outlined ${val.color}">${val.text}</span>
+                        </span>
+                        <span class="flex items-center gap-1 px-1 py-0.2 bg-slate-950 border border-slate-850 rounded">
+                            <span class="material-symbols-outlined ${rsk.color}">${rsk.text}</span>
+                        </span>
+                    </div>
+                `;
+            }
+
+            // Expose a prominent expand trigger button when highlighted active
+            const expandModalButtonHtml = isFocus 
+                ? `<button onclick="event.stopPropagation(); launchCenterpieceModal();" class="absolute right-7 top-2 bg-slate-950 text-emerald-400 hover:text-emerald-300 border border-slate-800 rounded w-5 h-5 flex items-center justify-center text-xs font-black transition cursor-pointer shadow" title="Launch Alignment Mind Map Modal">+</button>`
+                : '';
+
+            card.innerHTML = `
+                <div class="flex items-start gap-1 w-full pr-12">
+                    <textarea disabled class="bg-transparent text-slate-200 focus:outline-none focus:bg-slate-950 rounded px-1 py-0.5 w-full font-semibold resize-none whitespace-normal break-words leading-normal overflow-hidden disabled:cursor-pointer" rows="1">${item.label}</textarea>
+                </div>
+                ${metricsSubRowMarkup}
+                ${expandModalButtonHtml}
+                <button onclick="deleteStrategicNode('${item.id}')" class="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition text-sm font-bold absolute right-2 top-2">×</button>
+            `;
+
+            const ta = card.querySelector('textarea');
+            setTimeout(() => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }, 1);
+            
+            ta.onblur = () => {
+                ta.setAttribute('disabled', 'true');
+                item.label = ta.value.trim() || "Untitled Statement Entry";
+                saveApplicationState();
+            };
+
+            return card;
+        }
+
+        function selectFocusNode(id) {
+            window.state.selectedNodeId = id;
+            renderAllInterfaceBuckets();
+        }
+
+        function launchCreationModal(type, classification) {
+            window.activeModalContext = { type, classification };
+            let businessTypeLabel = classification;
+            if (classification === 'H1') businessTypeLabel = 'Horizon 1 Project';
+            if (classification === 'H2') businessTypeLabel = 'Horizon 2 Project';
+            if (classification === 'H3') businessTypeLabel = 'Horizon 3 Project';
+
+            document.getElementById('modal-heading-title').innerText = `Add New ${businessTypeLabel}`;
+            document.getElementById('modal-input-label').value = '';
+            document.getElementById('modal-input-description').value = '';
+            
+            document.getElementById('modal-select-investment').value = 'Small Investment';
+            document.getElementById('modal-select-value').value = 'Low Value';
+            document.getElementById('modal-select-risk').value = 'Low Risk';
+
+            const projectBlocks = document.getElementById('modal-project-attribute-block');
+            if (type === 'Project') {
+                projectBlocks.classList.remove('hidden');
+            } else {
+                projectBlocks.classList.add('hidden');
+            }
+
+            document.getElementById('creation-modal-backdrop').classList.remove('hidden');
+            document.getElementById('modal-input-label').focus();
+        }
+
+        function dismissCreationModal() {
+            document.getElementById('creation-modal-backdrop').classList.add('hidden');
+            window.activeModalContext = null;
+        }
+
+        function commitModalNodeCreation() {
+            if (!window.activeModalContext) return;
+            const { type, classification } = window.activeModalContext;
+
+            const labelVal = document.getElementById('modal-input-label').value.trim();
+            const descriptionVal = document.getElementById('modal-input-description').value.trim();
+
+            if (!labelVal) {
+                alert("Please provide an executive headline summary before creation.");
+                return;
+            }
+
+            let maxNum = 0;
+            window.state.items.forEach(i => {
+                const parsed = parseInt(i.id.replace('n', ''));
+                if (!isNaN(parsed) && parsed > maxNum) maxNum = parsed;
+            });
+            const nextId = `n${maxNum + 1}`;
+            const siblings = window.state.items.filter(i => i.classification === classification).length;
+
+            const baseObj = {
+                id: nextId,
+                objectType: type,
+                classification: classification,
+                label: labelVal,
+                description: descriptionVal,
+                rank: siblings,
+                relationships: []
+            };
+
+            if (type === 'Project') {
+                baseObj.investmentRequired = document.getElementById('modal-select-investment').value;
+                baseObj.expectedValue = document.getElementById('modal-select-value').value;
+                baseObj.riskLevel = document.getElementById('modal-select-risk').value;
+                baseObj.owner = "Unassigned Lead Core";
+            }
+
+            window.state.items.push(baseObj);
+            window.state.selectedNodeId = nextId;
+            
+            saveApplicationState();
+            dismissCreationModal();
+            renderAllInterfaceBuckets();
+        }
+
+        function deleteStrategicNode(id) {
+            event.stopPropagation();
+            if (!confirm(`Permanently remove strategic matrix item [${id}]?`)) return;
+            window.state.items = window.state.items.filter(i => i.id !== id);
+            window.state.items.forEach(i => { if(i.relationships) i.relationships = i.relationships.filter(rId => rId !== id); });
+            if (window.state.selectedNodeId === id) window.state.selectedNodeId = window.state.items[0]?.id || null;
+            saveApplicationState();
+            renderAllInterfaceBuckets();
+        }
+
+        // =========================================================================
+        // VISUAL MIND MAP DIALOG MODULES (image_c43917.png LAYOUT COMPLIANCE)
+        // =========================================================================
+        function launchCenterpieceModal() {
+            renderSpatialCenterpieceCanvas();
+            document.getElementById('centerpiece-modal-backdrop').classList.remove('hidden');
+        }
+
+        function dismissCenterpieceModal() {
+            document.getElementById('centerpiece-modal-backdrop').classList.add('hidden');
+            renderAllInterfaceBuckets(); 
+        }
+
+        function handleBackdropDismissal(event) {
+            if (event.target.id === 'centerpiece-modal-backdrop') {
+                dismissCenterpieceModal();
+            }
+        }
+
+        function renderSpatialCenterpieceCanvas() {
+            const canvas = document.getElementById('mindmap-canvas');
+            const metaPanel = document.getElementById('mindmap-metadata-panel');
+            
+            if (!window.state.selectedNodeId || window.state.items.length === 0) return;
+
+            const focusNode = window.state.items.find(i => i.id === window.state.selectedNodeId);
+            if (!focusNode) return;
+
+            const linkedNodes = [];
+            window.state.items.forEach(item => {
+                if (item.id === focusNode.id) {
+                    (item.relationships || []).forEach(targetId => {
+                        const target = window.state.items.find(t => t.id === targetId);
+                        if (target && !linkedNodes.some(x => x.id === target.id)) linkedNodes.push(target);
+                    });
+                } else {
+                    if ((item.relationships || []).includes(focusNode.id)) {
+                        if (!linkedNodes.some(x => x.id === item.id)) linkedNodes.push(item);
+                    }
+                }
+            });
+
+            const buckets = { Strength: [], Weakness: [], Opportunity: [], Threat: [], H1: [], H2: [], H3: [] };
+            linkedNodes.forEach(n => { if (buckets[n.classification]) buckets[n.classification].push(n); });
+
+            const centerColorClass = THEME_ACCENTS[focusNode.classification]?.bgCircle || 'border-slate-700 ring-slate-700/30';
+
+            const buildCategoryMarkupBlock = (title, key, cssColor) => {
+                const currentLinks = buckets[key] || [];
+                const nonLinkedItems = window.state.items.filter(i => i.id !== focusNode.id && i.classification === key && !(focusNode.relationships || []).includes(i.id));
+
+                let cardsHtml = currentLinks.map(n => `
+                    <div class="flex items-center justify-between p-2 bg-slate-900 border border-slate-850 rounded-lg text-[11px] gap-2 font-sans font-medium text-slate-200">
+                        <span class="truncate leading-normal"><b class="font-mono text-slate-500 text-[10px] mr-1">[${n.id}]</b>${n.label}</span>
+                        <button onclick="severRelationshipLink('${n.id}')" class="text-red-400 hover:text-red-300 font-bold text-xs px-1 cursor-pointer">✕</button>
+                    </div>
+                `).join("");
+
+                if (!cardsHtml) cardsHtml = `<div class="text-[10px] text-slate-600 italic p-1">No active links.</div>`;
+
+                let addSelectHtml = '';
+                if (nonLinkedItems.length > 0) {
+                    addSelectHtml = `
+                        <div class="mt-2 pt-1.5 border-t border-slate-800 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-slate-500 text-xs">add</span>
+                            <select onchange="if(this.value) { connectIsolatedRelationshipLink(this.value); }" class="bg-slate-950 border border-slate-850 text-[10px] p-0.5 rounded text-slate-400 focus:outline-none w-full font-medium">
+                                <option value="">Link ${title}...</option>
+                                ${nonLinkedItems.map(i => `<option value="${i.id}">[${i.id}] ${i.label.substring(0,35)}...</option>`).join("")}
+                            </select>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="flex flex-col gap-1.5">
+                        <div class="text-[10px] font-extrabold uppercase tracking-wider ${cssColor} flex justify-between items-center border-b border-slate-800 pb-1">
+                            <span>${title}</span>
+                            <span class="text-slate-500 font-mono text-[9px] font-normal">(${currentLinks.length})</span>
+                        </div>
+                        <div class="space-y-1 max-h-[90px] overflow-y-auto pr-0.5">
+                            ${cardsHtml}
+                        </div>
+                        ${addSelectHtml}
+                    </div>
+                `;
+            };
+
+            // INJECTS 3-COLUMN MIND MAP SCHEMA PRESERVING THE SYMMETRY OBSERVED IN image_c43917.png[cite: 1]
+            canvas.innerHTML = `
+                <!-- COLUMN 1: STRENGTHS & OPPORTUNITIES BLOCKS LAYER[cite: 1] -->
+                <div class="flex flex-col gap-6 justify-center text-right pr-2">
+                    ${buildCategoryMarkupBlock('Strengths', 'Strength', 'text-[#018945]')}
+                    <div class="border-b border-dashed border-slate-800/80 my-1"></div>
+                    ${buildCategoryMarkupBlock('Opportunities', 'Opportunity', 'text-[#6ea0dd]')}
+                </div>
+
+                <!-- COLUMN 2: CENTERPIECE HIGHLIGHTED FOCAL ASSIGNED SELECTION CELL[cite: 1] -->
+                <div class="flex flex-col justify-center px-2">
+                    <div class="p-5 rounded-2xl text-center w-full shadow-2xl bg-slate-950 border-2 ${centerColorClass} flex flex-col gap-2.5">
+                        <span class="text-[9px] font-mono tracking-widest bg-slate-900 border border-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full mx-auto w-fit font-bold uppercase">
+                            Focal Node [${focusNode.id}]
+                        </span>
+                        <div class="text-xs font-black text-white leading-snug px-1 uppercase tracking-wide">${focusNode.label}</div>
+                        <p class="text-[10px] text-slate-400 font-medium leading-relaxed max-w-[210px] mx-auto border-t border-slate-800/60 pt-2">${focusNode.description || "No specific annotations logged yet."}</p>
+                    </div>
+                    
+                    <!-- HORIZON CHRONOLOGY LIST DOCK NESTED IN THE CENTER PIECE LOWER MATRIX -->
+                    <div class="mt-4 p-2.5 bg-slate-950/60 border border-slate-850 rounded-xl space-y-2">
+                        <div class="text-[8px] font-bold tracking-widest uppercase text-slate-500 text-center">Connected Delivery Horizons</div>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            ${buildCategoryMarkupBlock('H1', 'H1', 'text-[#f0aa00]')}
+                            ${buildCategoryMarkupBlock('H2', 'H2', 'text-[#e67e22]')}
+                            ${buildCategoryMarkupBlock('H3', 'H3', 'text-[#8e44ad]')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 3: WEAKNESSES & THREATS BLOCKS LAYER[cite: 1] -->
+                <div class="flex flex-col gap-6 justify-center pl-2">
+                    ${buildCategoryMarkupBlock('Weaknesses', 'Weakness', 'text-[#e6aaa0]')}
+                    <div class="border-b border-dashed border-slate-800/80 my-1"></div>
+                    ${buildCategoryMarkupBlock('Threats', 'Threat', 'text-[#e14b28]')}
+                </div>
+            `;
+
+            // INJECTS METADATA FORMS DIRECTLY BELOW THE MIND MAP CANVAS[cite: 1]
+            metaPanel.innerHTML = `
+                <div class="md:col-span-2 flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs text-slate-500">description</span> Active Focus Element Strategy Notes & Project Descriptions
+                    </label>
+                    <textarea id="modal-live-desc-textarea" rows="3" class="w-full bg-slate-900 text-slate-300 text-xs border border-slate-800 rounded-lg p-2.5 focus:outline-none focus:border-slate-600 font-medium font-sans leading-relaxed transition" placeholder="Add modular metrics, action vectors, or capability parameters for this focal node...">${focusNode.description || ""}</textarea>
+                </div>
+                
+                ${focusNode.objectType === 'Project' ? `
+                    <div class="md:col-span-2 grid grid-cols-3 gap-3 border-t border-slate-800 pt-3 mt-1">
+                        <div>
+                            <label class="text-[8px] uppercase font-bold text-slate-400 block mb-1">Investment Tier</label>
+                            <select id="modal-live-inv-select" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-[10px] focus:outline-none text-slate-200 font-semibold cursor-pointer">
+                                <option value="Small Investment" ${focusNode.investmentRequired === 'Small Investment' ? 'selected' : ''}>Small Investment</option>
+                                <option value="Medium Investment" ${focusNode.investmentRequired === 'Medium Investment' ? 'selected' : ''}>Medium Investment</option>
+                                <option value="Large Investment" ${focusNode.investmentRequired === 'Large Investment' ? 'selected' : ''}>Large Investment</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[8px] uppercase font-bold text-slate-400 block mb-1">Value Potential</label>
+                            <select id="modal-live-val-select" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-[10px] focus:outline-none text-slate-200 font-semibold cursor-pointer">
+                                <option value="Low Value" ${focusNode.expectedValue === 'Low Value' ? 'selected' : ''}>Low Value</option>
+                                <option value="Medium Value" ${focusNode.expectedValue === 'Medium Value' ? 'selected' : ''}>Medium Value</option>
+                                <option value="High Value" ${focusNode.expectedValue === 'High Value' ? 'selected' : ''}>High Value</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[8px] uppercase font-bold text-slate-400 block mb-1">Execution Risk Level</label>
+                            <select id="modal-live-rsk-select" class="w-full bg-slate-900 border border-slate-800 rounded p-1.5 text-[10px] focus:outline-none text-slate-200 font-semibold cursor-pointer">
+                                <option value="Low Risk" ${focusNode.riskLevel === 'Low Risk' ? 'selected' : ''}>Low Risk</option>
+                                <option value="Medium Risk" ${focusNode.riskLevel === 'Medium Risk' ? 'selected' : ''}>Medium Risk</option>
+                                <option value="High Risk" ${focusNode.riskLevel === 'High Risk' ? 'selected' : ''}>High Risk</option>
+                            </select>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            // Bind events safely
+            document.getElementById('modal-live-desc-textarea').addEventListener('input', (e) => { updateDescriptionFieldValue(e.target.value); });
+            if (focusNode.objectType === 'Project') {
+                document.getElementById('modal-live-inv-select').addEventListener('change', (e) => { updateProjectSpecField('investmentRequired', e.target.value); });
+                document.getElementById('modal-live-val-select').addEventListener('change', (e) => { updateProjectSpecField('expectedValue', e.target.value); });
+                document.getElementById('modal-live-rsk-select').addEventListener('change', (e) => { updateProjectSpecField('riskLevel', e.target.value); });
+            }
+        }
+
+        function updateDescriptionFieldValue(val) {
+            const focusNode = window.state.items.find(i => i.id === window.state.selectedNodeId);
+            if (focusNode) {
+                focusNode.description = val;
+                saveApplicationState();
+            }
+        }
+
+        function updateProjectSpecField(field, val) {
+            const focusNode = window.state.items.find(i => i.id === window.state.selectedNodeId);
+            if (focusNode && focusNode.objectType === 'Project') {
+                focusNode[field] = val;
+                saveApplicationState();
+            }
+        }
+
+        function connectIsolatedRelationshipLink(targetId) {
+            const focusNode = window.state.items.find(i => i.id === window.state.selectedNodeId);
+            if (!focusNode || !targetId) return;
+            if (!focusNode.relationships) focusNode.relationships = [];
+            
+            if (!focusNode.relationships.includes(targetId)) {
+                focusNode.relationships.push(targetId);
+            }
+            saveApplicationState();
+            renderSpatialCenterpieceCanvas();
+        }
+
+        function severRelationshipLink(targetId) {
+            const focusNode = window.state.items.find(i => i.id === window.state.selectedNodeId);
+            if (!focusNode) return;
+            if (focusNode.relationships) focusNode.relationships = focusNode.relationships.filter(id => id !== targetId);
+
+            const targetNode = window.state.items.find(i => i.id === targetId);
+            if (targetNode && targetNode.relationships) targetNode.relationships = targetNode.relationships.filter(id => id !== focusNode.id);
+
+            saveApplicationState();
+            renderSpatialCenterpieceCanvas();
+        }
+
+        // =========================================================================
+        // CSV SERIALIZATION MATRIX
+        // =========================================================================
+        function exportToCSV() {
+            const headers = ["ID", "Archetype", "Classification", "Rank", "Title", "Description", "Capital_Investment", "Value_Output", "Risk_Tier", "Functional_Owner", "Connected_IDs"];
+            const entries = [];
+
+            window.state.items.forEach(item => {
+                const links = (item.relationships || []).join(" | ");
+                const row = [
+                    item.id,
+                    item.objectType,
+                    item.classification,
+                    item.rank,
+                    item.label || "",
+                    item.description || "",
+                    item.objectType === 'Project' ? (item.investmentRequired || "Small Investment") : "N/A",
+                    item.objectType === 'Project' ? (item.expectedValue || "Low Value") : "N/A",
+                    item.objectType === 'Project' ? (item.riskLevel || "Low Risk") : "N/A",
+                    item.objectType === 'Project' ? (item.owner || "Unassigned Lead") : "N/A",
+                    links
+                ];
+                entries.push(row);
+            });
+
+            let dataString = "data:text/csv;charset=utf-8,";
+            dataString += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\n";
+            entries.forEach(r => {
+                dataString += r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",") + "\n";
+            });
+
+            const linkHook = document.createElement("a");
+            linkHook.setAttribute("href", encodeURI(dataString));
+            const parsedTitle = (window.state.strategicScope || "Strategic_Registry").trim().replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            linkHook.setAttribute("download", `${parsedTitle}_matrix_registry.csv`);
+            document.body.appendChild(linkHook);
+            linkHook.click();
+            document.body.removeChild(linkHook);
+        }
+
+        function triggerCSVImport() {
+            document.getElementById('csv-file-hook').click();
+        }
+
+        function handleCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => { processSpreadsheetParsing(e.target.result); };
+            reader.readAsText(file);
+        }
+
+        function processSpreadsheetParsing(rawText) {
+            const rows = rawText.split(/\r?\n/);
+            if (rows.length < 2) {
+                alert("Import Terminated: Missing structural core field mappings.");
+                return;
+            }
+
+            const cleanSplitter = (lineStr) => {
+                let cell = '', parsed = [], inQuotes = false;
+                for (let i = 0; i < lineStr.length; i++) {
+                    let char = lineStr.charAt(i);
+                    if (char === '"') inQuotes = !inQuotes;
+                    else if (char === ',' && !inQuotes) { parsed.push(cell); cell = ''; }
+                    else cell += char;
+                }
+                parsed.push(cell);
+                return parsed.map(v => v.trim().replace(/^"/, '').replace(/"$/, '').replace(/""/g, '"'));
+            };
+
+            const parsedItems = [];
+            for (let i = 1; i < rows.length; i++) {
+                if (!rows[i].trim()) continue;
+                const columns = cleanSplitter(rows[i]);
+                if (columns.length < 5) continue;
+
+                let invField = columns[6] || 'Small Investment';
+                let valField = columns[7] || 'Low Value';
+                let rskField = columns[8] || 'Low Risk';
+
+                const item = {
+                    id: columns[0],
+                    objectType: columns[1],
+                    classification: columns[2],
+                    rank: parseInt(columns[3]) || 0,
+                    label: columns[4],
+                    description: columns[5],
+                    relationships: []
+                };
+
+                if (item.objectType === 'Project') {
+                    item.investmentRequired = columns[6] !== 'N/A' ? invField : "Small Investment";
+                    item.expectedValue = columns[7] !== 'N/A' ? valField : "Low Value";
+                    item.riskLevel = columns[8] !== 'N/A' ? rskField : "Low Risk";
+                    item.owner = columns[9] !== 'N/A' ? columns[9] : "Unassigned Lead Core";
+                }
+
+                if (columns[10]) {
+                    item.relationships = columns[10].split('|').map(s => s.trim()).filter(s => s.length > 0);
+                }
+                parsedItems.push(item);
+            }
+
+            window.state.items = parsedItems;
+            window.state.selectedNodeId = parsedItems.length ? parsedItems[0].id : null;
+            saveApplicationState();
+            renderAllInterfaceBuckets();
+            alert(`Spreadsheet Ingestion Complete. Synced ${parsedItems.length} roadmap data rows.`);
+        }
+
+        function clearBoardToBlank() {
+            if (!confirm("Are you sure you want to completely clear the board? This will wipe all current records and reset the system to an empty configuration.")) return;
+            window.state = { "strategicScope": "New Strategic Architecture Project Portfolio", "items": [], "selectedNodeId": null };
+            saveApplicationState();
+            renderAllInterfaceBuckets();
+        }
+    </script>
+</body>
+</html>
