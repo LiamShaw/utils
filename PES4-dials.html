@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Session 4 - dial sensitivity</title>
+<style>
+:root { --ink:#0f172a; --muted:#5b6b84; --line:#e3e8f0; --bg:#f6f8fb; --card:#fff;
+  --p:#2563eb; --v:#d97706; --c:#dc2626; --m:#059669; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+.wrap { max-width:1020px; margin:0 auto; padding:26px 20px 64px; }
+header h1 { font-size:23px; margin:0 0 4px; }
+.sub { color:var(--muted); margin:0 0 14px; }
+.stats { display:flex; gap:26px; flex-wrap:wrap; margin:12px 0 4px; }
+.stat b { display:block; font-size:20px; line-height:1.2; }
+.stat span { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:18px 20px; margin:16px 0; }
+h2 { font-size:16px; margin:0 0 10px; }
+p { margin:0 0 10px; }
+table { border-collapse:collapse; width:100%; font-size:14px; }
+th,td { text-align:right; padding:7px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+th:first-child,td:first-child { text-align:left; }
+th { color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+tr:last-child td { border-bottom:none; }
+.pos { color:#047857; } .neg { color:#b91c1c; }
+.chip { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:7px; vertical-align:baseline; }
+.grid2 { display:grid; grid-template-columns: 330px 1fr; gap:16px; align-items:start; }
+@media (max-width:820px) { .grid2 { grid-template-columns:1fr; } }
+.dialrow { display:grid; grid-template-columns:150px 1fr 56px; gap:10px; align-items:center; margin:12px 0; }
+.dialrow label { font-size:13px; }
+input[type=range] { width:100%; }
+.readout { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+.presets { margin-top:14px; }
+.presets button { margin:0 8px 8px 0; padding:6px 12px; border-radius:999px;
+  border:1px solid var(--line); background:#fff; cursor:pointer; font:inherit; font-size:13px; color:var(--ink); }
+.presets button:hover { border-color:#94a3b8; }
+.tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+@media (max-width:620px) { .tiles { grid-template-columns:repeat(2,1fr); } }
+.tile { border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+.tile b { font-size:19px; display:block; line-height:1.25; }
+.tile span { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+.tile em { font-style:normal; font-size:12px; color:var(--muted); }
+.brow { display:grid; grid-template-columns:158px 1fr 78px; gap:10px; align-items:center; margin:9px 0; }
+.blabel { font-size:13px; }
+.track { position:relative; height:12px; background:#eef2f7; border-radius:6px; }
+.track .mid { position:absolute; left:50%; top:-3px; bottom:-3px; width:1px; background:#cbd5e1; }
+.bar { position:absolute; top:0; bottom:0; border-radius:6px; }
+.bval { text-align:right; font-size:13px; font-variant-numeric:tabular-nums; font-weight:600; }
+.small { font-size:12.5px; color:var(--muted); }
+.tick { font-size:11px; fill:#64748b; }
+.axtitle { font-size:11px; fill:#475569; }
+.note { font-size:12px; }
+.legend { display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-size:13px; color:var(--ink); align-items:center; }
+.sw { display:inline-block; width:22px; height:0; border-top:3px solid; margin-right:6px; vertical-align:middle; }
+.dotsw { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+footer { color:var(--muted); font-size:12.5px; margin-top:22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Atlas LBO - Session 4 - the four dials, per point</h1>
+  <p class="sub">Measured in the "S4 Revenue" tab of the Atlas LBO model. Plan position: price growth 2.0 percent,
+  volume growth 3.5 percent, churn 1.5 percent, mix and cross-sell 0.5 percent. Values in EUR millions.</p>
+  <div class="stats">
+    <div class="stat"><b id="h-irr"></b><span>IRR tile</span></div>
+    <div class="stat"><b id="h-moic"></b><span>MOIC</span></div>
+    <div class="stat"><b id="h-eb5"></b><span>year-5 EBITDA</span></div>
+    <div class="stat"><b>2.1pp</b><span>IRR per point</span></div>
+  </div>
+</header>
+
+<section class="card">
+  <h2>The answer, per point</h2>
+  <p>One point up on <b>mix and cross-sell</b> moves the IRR the most in this model:
+  <b>+2.14pp</b>, against <b>+2.11pp</b> for price growth and volume growth, and
+  <b>-2.18pp</b> for one point more churn (one point less churn is worth +2.11pp, the same as
+  one point of price). Price, volume and churn are mathematically the same lever here; mix leads
+  only because it starts from the smallest base (0.5 percent). The model gives every extra euro of
+  revenue the same incremental margin, about 25 percent, so it cannot rank price above volume.
+  That ranking lives in the case economics: about 0.8m of EBITDA per point of price, against
+  0.15 to 0.25m per point of volume.</p>
+  <table>
+    <thead>
+      <tr><th>Dial</th><th>+1pt IRR</th><th>+1pt MOIC</th><th>+1pt yr-5 EBITDA</th>
+      <th>-1pt IRR</th><th>-1pt MOIC</th><th>-1pt yr-5 EBITDA</th></tr>
+    </thead>
+    <tbody id="ans-body"></tbody>
+  </table>
+  <p class="small" style="margin-top:10px">For churn, a plus is more churn, so its row reads the other way:
+  more churn hurts, less churn helps exactly like a point of price. Every number above came from Excel
+  itself, recalculated after each move.</p>
+</section>
+
+<section class="card">
+  <h2>Move the dials</h2>
+  <div class="grid2">
+    <div>
+      <p class="small">Drag a dial and watch the tiles, the per-point bars and the EBITDA table respond.
+      The buttons jump straight to the exercise positions.</p>
+      <div class="dialrow"><label>Price growth</label><input type="range" id="s-p" min="0" max="6" step="0.1" value="2"><span class="readout" id="s-p-v"></span></div>
+      <div class="dialrow"><label>Volume growth</label><input type="range" id="s-v" min="0" max="7" step="0.1" value="3.5"><span class="readout" id="s-v-v"></span></div>
+      <div class="dialrow"><label>Churn</label><input type="range" id="s-c" min="0" max="5" step="0.1" value="1.5"><span class="readout" id="s-c-v"></span></div>
+      <div class="dialrow"><label>Mix and cross-sell</label><input type="range" id="s-m" min="0" max="4" step="0.1" value="0.5"><span class="readout" id="s-m-v"></span></div>
+      <div class="presets">
+        <button data-preset='{}'>Plan position</button>
+        <button data-preset='{"p":3}'>Price +1pt</button>
+        <button data-preset='{"v":4.5}'>Volume +1pt</button>
+        <button data-preset='{"c":0.5}'>Churn -1pt</button>
+        <button data-preset='{"m":1.5}'>Mix +1pt</button>
+      </div>
+    </div>
+    <div>
+      <div class="tiles">
+        <div class="tile" id="t-irr"><span>IRR</span><b></b><em></em></div>
+        <div class="tile" id="t-moic"><span>MOIC</span><b></b><em></em></div>
+        <div class="tile" id="t-sp"><span>Sponsor MOIC</span><b></b><em></em></div>
+        <div class="tile" id="t-mg"><span>Management MOIC</span><b></b><em></em></div>
+        <div class="tile" id="t-cash"><span>Lowest cash</span><b></b><em></em></div>
+        <div class="tile" id="t-eb5"><span>Year-5 EBITDA</span><b></b><em></em></div>
+      </div>
+      <h2 style="margin:16px 0 4px">Per +1 point, from where the sliders stand</h2>
+      <div id="bars"></div>
+      <h2 style="margin:16px 0 4px">EBITDA, year by year</h2>
+      <table>
+        <thead><tr><th>Year</th><th>Plan position</th><th>Your dials</th><th>Delta</th></tr></thead>
+        <tbody id="ebody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>The picture: what one dial at a time does to the IRR</h2>
+  <p class="small" style="margin-bottom:12px">Lines are the model, anchored at the plan position.
+  Dots are the actual Excel runs: each dial at plus and minus one and two points, plus the base.
+  The dots sit exactly on the lines.</p>
+  <svg id="chart" viewBox="0 0 940 400" role="img" aria-label="Change in IRR when moving one dial"></svg>
+  <div class="legend">
+    <span><span class="sw" style="border-color:#2563eb"></span>Price growth</span>
+    <span><span class="sw" style="border-color:#d97706;border-top-width:6px;opacity:.55"></span>Volume growth</span>
+    <span><span class="sw" style="border-color:#dc2626"></span>Churn</span>
+    <span><span class="sw" style="border-color:#059669"></span>Mix and cross-sell</span>
+    <span><span class="dotsw" style="background:#64748b"></span>Excel run point</span>
+  </div>
+  <p class="small" style="margin-top:10px">Price and volume draw the exact same line: in this model they are the
+  same lever. Churn mirrors price: one point more churn equals one point less price. Mix keeps the same shape,
+  a hair steeper per point.</p>
+</section>
+
+<footer>
+  <p>Method: every move was made in a scratch copy of "Atlas_LBO Model_Session 4.xlsx" and recalculated by Excel
+  itself; 35 scenarios were recorded (the base, each dial at plus and minus one and two points, and random
+  combinations). The sliders on this page run the same formulas. They were checked against every Excel run: 735 compared values across 35 scenarios, largest deviation 8.42e-12. Run on 16 October 2026.</p>
+  <p>Base case (the file as shipped): IRR 27.81 percent, MOIC 3.41x, sponsor MOIC 3.02x,
+  year-5 EBITDA 19.38m. The original workbook was never modified.</p>
+</footer>
+
+</div>
+
+<script>
+// Exact re-implementation of the S4 Revenue tab logic of the Atlas LBO model.
+// Single source of truth for the interactive page; validated against Excel COM
+// runs of the real workbook by validate.mjs.
+
+const PLAN = {
+  rev0: 82.0,
+  ebitda0: 11.5,
+  entryMult: 8.7,
+  exitMult: 10.0,
+  hold: 5,
+  debt0: 45.0,
+  equity0: 55.05, // D13 = entry EV - debt = 100.05 - 45
+  cash0: 2.0,
+  rate: 0.0675, // option C senior loan rate, D32
+  capex: 0.03,
+  tax: 0.25,
+  schedRepay: 2.5, // option C, D33
+  sweep: 0.5, // D29
+  mgmtIn: 3.5, // D35 + D36
+  mgmtShare: 3.5 / 55.05, // G115
+  promote: 0.15, // D37
+  hurdle: 3.0, // D38
+  // fixed plan rows D74-D77 (do not move with the dials)
+  planP: 0.02,
+  planV: 0.035,
+  planC: 0.015,
+  planM: 0.005,
+  planEbitdaGrowth: 0.11, // D21
+  opex0: 0.11,
+  opexChg: -0.001, // D79
+  sgaVar0: 0.04,
+  sgaVarChg: -0.0005, // D81
+  sgaFix0: 8.18,
+  sgaFixGrowth: 0.02, // D83
+  dso: 58, // D49/D66
+  invTurn: 9.2, // D50/D67
+  dpo: 45, // D51/D68
+};
+
+function runModel({ p, v, c, m }) {
+  const A = PLAN;
+  const factor = (1 + p) * (1 + v - c) * (1 + m);
+  const planFactor = (1 + A.planP) * (1 + A.planV - A.planC) * (1 + A.planM);
+
+  const rev = [A.rev0];
+  const planRev = [A.rev0];
+  for (let t = 1; t <= A.hold; t++) {
+    rev.push(rev[t - 1] * factor);
+    planRev.push(planRev[t - 1] * planFactor);
+  }
+
+  const ebitda = [];
+  const cosPct = [];
+  const nwc = [];
+  for (let t = 0; t <= A.hold; t++) {
+    const opexPct = A.opex0 + A.opexChg * t;
+    const sgaPct = A.sgaVar0 + A.sgaVarChg * t;
+    const sgaFix = A.sgaFix0 * Math.pow(1 + A.sgaFixGrowth, t);
+    const planEbitda = A.ebitda0 * Math.pow(1 + A.planEbitdaGrowth, t);
+    const cos = 1 - opexPct - sgaPct - (sgaFix + planEbitda) / planRev[t];
+    cosPct.push(cos);
+    ebitda.push(rev[t] * (1 - cos - opexPct - sgaPct) - sgaFix);
+    const rec = rev[t] * A.dso / 365;
+    const inv = (rev[t] * cos) / A.invTurn;
+    const pay = (rev[t] * cos) * A.dpo / 365;
+    nwc.push(rec + inv - pay);
+  }
+
+  const cash = [A.cash0];
+  const debt = [A.debt0];
+  const netDebt = [A.debt0 - A.cash0];
+  const fcf = [0];
+  for (let t = 1; t <= A.hold; t++) {
+    const capex = -rev[t] * A.capex;
+    const dwc = -(nwc[t] - nwc[t - 1]);
+    const interest = -debt[t - 1] * A.rate; // on opening balance, no circularity
+    const taxable = Math.max(0, ebitda[t] + capex + interest);
+    const tax = -taxable * A.tax;
+    const f = ebitda[t] + capex + dwc + interest + tax;
+    fcf.push(f);
+    const repay = -Math.min(debt[t - 1], A.schedRepay);
+    const surplus = Math.max(0, cash[t - 1] + f + repay - A.cash0);
+    const sweepAmt = -Math.min(debt[t - 1] + repay, surplus * A.sweep);
+    cash.push(cash[t - 1] + f + repay + sweepAmt);
+    debt.push(debt[t - 1] + repay + sweepAmt);
+    netDebt.push(debt[t] - cash[t]);
+  }
+
+  const exitEbitda = ebitda[A.hold];
+  const exitEv = exitEbitda * A.exitMult;
+  const exitEquity = Math.max(0, exitEv - netDebt[A.hold]);
+  const moic = exitEquity / A.equity0;
+  const irr = exitEquity > 0 ? Math.pow(exitEquity / A.equity0, 1 / A.hold) - 1 : -1;
+  const gain = Math.max(0, exitEquity - A.equity0);
+  const sponsorBefore = exitEquity * (1 - A.mgmtShare) / (A.equity0 - A.mgmtIn);
+  const promotePay = sponsorBefore >= A.hurdle ? A.promote * gain : 0;
+  const mgmtTakes = exitEquity * A.mgmtShare + promotePay;
+  const mgmtMoic = mgmtTakes / A.mgmtIn;
+  const sponsorMoic = (exitEquity - mgmtTakes) / (A.equity0 - A.mgmtIn);
+  const lowestCash = Math.min(...cash.slice(1, A.hold + 1));
+
+  return {
+    rev, planRev, ebitda, cash, debt, netDebt, fcf,
+    exitEbitda, exitEv, exitEquity, moic, irr, mgmtMoic, sponsorMoic, lowestCash,
+  };
+}
+
+</script>
+<script>
+const EXCEL_DOTS = [{"dial":"base","pts":0,"irr":0.27813534195376577},{"dial":"p","pts":1.0,"irr":0.29926726529785874},{"dial":"p","pts":-1.0,"irr":0.2563614807787762},{"dial":"p","pts":2.0,"irr":0.3198303341531519},{"dial":"p","pts":-2.0,"irr":0.2338582540839944},{"dial":"v","pts":1.0,"irr":0.29926726529785874},{"dial":"v","pts":-1.0,"irr":0.2563614807787762},{"dial":"v","pts":2.0,"irr":0.31983033415315143},{"dial":"v","pts":-2.0,"irr":0.23385825408399374},{"dial":"c","pts":1.0,"irr":0.2563614807787762},{"dial":"c","pts":-1.0,"irr":0.29926726529785874},{"dial":"c","pts":2.0,"irr":0.23385825408399374},{"dial":"c","pts":-2.0,"irr":0.3198303341531512},{"dial":"m","pts":1.0,"irr":0.2995781923407952},{"dial":"m","pts":-1.0,"irr":0.2560312116447605},{"dial":"m","pts":2.0,"irr":0.3204360801456989},{"dial":"m","pts":-2.0,"irr":0.23317425843865824}];
+const EX_ROWS = [{"key":"m","label":"Mix and cross-sell","color":"#059669","up":{"dirr":2.144285038702942,"dmoic":0.295890652571964,"deb5":1.441819277887177},"down":{"dirr":-2.2104130309005265,"dmoic":-0.2849247339403407,"deb5":-1.3855613513360794}},{"key":"p","label":"Price growth","color":"#2563eb","up":{"dirr":2.1131923344092973,"dmoic":0.2914583403098314,"deb5":1.4202003846523183},"down":{"dirr":-2.1773861174989584,"dmoic":-0.2808125918711988,"deb5":-1.365585015424216}},{"key":"v","label":"Volume growth","color":"#d97706","up":{"dirr":2.1131923344092973,"dmoic":0.2914583403098314,"deb5":1.4202003846523183},"down":{"dirr":-2.1773861174989584,"dmoic":-0.2808125918711992,"deb5":-1.365585015424216}},{"key":"c","label":"Churn","color":"#dc2626","up":{"dirr":-2.1773861174989584,"dmoic":-0.2808125918711992,"deb5":-1.365585015424216},"down":{"dirr":2.1131923344092973,"dmoic":0.2914583403098314,"deb5":1.4202003846523183}}];
+
+const DIALS = [
+  {key:'m', label:'Mix and cross-sell', color:'#059669'},
+  {key:'p', label:'Price growth', color:'#2563eb'},
+  {key:'v', label:'Volume growth', color:'#d97706'},
+  {key:'c', label:'Churn', color:'#dc2626'},
+];
+const BY_KEY = {};
+DIALS.forEach(function(d){ BY_KEY[d.key] = d; });
+
+const BASE_STATE = {p:2, v:3.5, c:1.5, m:0.5};
+let S = Object.assign({}, BASE_STATE);
+function toModel(s){ return {p:s.p/100, v:s.v/100, c:s.c/100, m:s.m/100}; }
+const baseOut = runModel(toModel(BASE_STATE));
+
+const el = function(id){ return document.getElementById(id); };
+const sign = function(x){ return x >= 0 ? '+' : ''; };
+const fPct = function(x){ return (x*100).toFixed(2) + '%'; };
+const fPp = function(x){ return sign(x) + (x*100).toFixed(2) + 'pp'; };
+const fX = function(x){ return sign(x) + x.toFixed(2) + 'x'; };
+const fM = function(x){ return sign(x) + x.toFixed(2) + 'm'; };
+const fMPlain = function(x){ return x.toFixed(2) + 'm'; };
+const cls = function(x){ return x >= 0.0001 ? 'pos' : (x <= -0.0001 ? 'neg' : ''); };
+
+function tile(id, val, delta, fmt){
+  const t = el(id);
+  t.querySelector('b').textContent = val;
+  const e = t.querySelector('em');
+  if (delta === null) { e.textContent = ''; e.className = ''; }
+  else { e.textContent = 'vs plan ' + fmt(delta); e.className = cls(delta); }
+}
+
+function update(){
+  const st = toModel(S);
+  const out = runModel(st);
+  tile('t-irr', fPct(out.irr), out.irr - baseOut.irr, fPp);
+  tile('t-moic', out.moic.toFixed(2) + 'x', out.moic - baseOut.moic, fX);
+  tile('t-sp', out.sponsorMoic.toFixed(2) + 'x', out.sponsorMoic - baseOut.sponsorMoic, fX);
+  tile('t-mg', out.mgmtMoic.toFixed(2) + 'x', out.mgmtMoic - baseOut.mgmtMoic, fX);
+  tile('t-cash', fMPlain(out.lowestCash), out.lowestCash - baseOut.lowestCash, fM);
+  tile('t-eb5', fMPlain(out.ebitda[5]), out.ebitda[5] - baseOut.ebitda[5], fM);
+
+  el('bars').innerHTML = DIALS.map(function(dl){
+    const st2 = Object.assign({}, st);
+    st2[dl.key] = st[dl.key] + 0.01;
+    const up = runModel(st2);
+    const dd = (up.irr - out.irr) * 100;
+    const w = Math.min(Math.abs(dd) / 2.5 * 46, 46);
+    const left = dd >= 0 ? 50 : 50 - w;
+    const fmt = sign(dd) + dd.toFixed(2) + 'pp';
+    const extra = dl.key === 'c' ? ' (up one point; down is the mirror)' : '';
+    return '<div class="brow"><span class="blabel"><i class="chip" style="background:' + dl.color +
+      '"></i>' + dl.label + '</span><div class="track"><div class="mid"></div><div class="bar" style="left:' +
+      left + '%;width:' + w + '%;background:' + dl.color + '"></div></div><span class="bval ' + cls(dd) +
+      '">' + fmt + '</span></div>';
+  }).join('') + '<p class="small">Churn row shows the effect of one point more churn' +
+    ' from the sliders as they stand; everything else is one point up.</p>';
+
+  let rows = '';
+  for (let t = 1; t <= 5; t++){
+    const dd = out.ebitda[t] - baseOut.ebitda[t];
+    rows += '<tr><td>Year ' + t + '</td><td>' + baseOut.ebitda[t].toFixed(2) + 'm</td><td>' +
+      out.ebitda[t].toFixed(2) + 'm</td><td class="' + cls(dd) + '">' + fM(dd) + '</td></tr>';
+  }
+  el('ebody').innerHTML = rows;
+
+  el('s-p-v').textContent = S.p.toFixed(1) + '%';
+  el('s-v-v').textContent = S.v.toFixed(1) + '%';
+  el('s-c-v').textContent = S.c.toFixed(1) + '%';
+  el('s-m-v').textContent = S.m.toFixed(1) + '%';
+}
+
+['p','v','c','m'].forEach(function(k){
+  el('s-' + k).value = S[k];
+  el('s-' + k).addEventListener('input', function(){
+    S[k] = parseFloat(this.value);
+    update();
+  });
+});
+document.querySelectorAll('[data-preset]').forEach(function(b){
+  b.addEventListener('click', function(){
+    S = Object.assign({}, BASE_STATE, JSON.parse(b.dataset.preset));
+    ['p','v','c','m'].forEach(function(k){ el('s-' + k).value = S[k]; });
+    update();
+  });
+});
+
+function answerTable(){
+  let rows = '';
+  for (const r of EX_ROWS){
+    const f = function(v, u){ return sign(v) + v.toFixed(2) + u; };
+    rows += '<tr><td><i class="chip" style="background:' + r.color + '"></i>' + r.label + '</td>' +
+      '<td class="' + cls(r.up.dirr) + '">' + f(r.up.dirr, 'pp') + '</td>' +
+      '<td>' + f(r.up.dmoic, 'x') + '</td>' +
+      '<td>' + f(r.up.deb5, 'm') + '</td>' +
+      '<td class="' + cls(r.down.dirr) + '">' + f(r.down.dirr, 'pp') + '</td>' +
+      '<td>' + f(r.down.dmoic, 'x') + '</td>' +
+      '<td>' + f(r.down.deb5, 'm') + '</td></tr>';
+  }
+  el('ans-body').innerHTML = rows;
+}
+
+function buildChart(){
+  const W = 940, H = 400, L = 64, R = 18, T = 18, B = 48;
+  const X0 = -3.2, X1 = 3.2, Y0 = -8, Y1 = 8;
+  const xs = function(x){ return L + (x - X0) / (X1 - X0) * (W - L - R); };
+  const ys = function(y){ return H - B - (y - Y0) / (Y1 - Y0) * (H - T - B); };
+  let svg = '';
+  for (let y = -8; y <= 8; y += 2){
+    svg += '<line x1="' + xs(X0) + '" y1="' + ys(y) + '" x2="' + xs(X1) + '" y2="' + ys(y) + '" stroke="#eef2f7"/>';
+    svg += '<text x="' + (L - 8) + '" y="' + (ys(y) + 4) + '" text-anchor="end" class="tick">' + y + '</text>';
+  }
+  for (let x = -3; x <= 3; x++){
+    svg += '<line x1="' + xs(x) + '" y1="' + ys(Y0) + '" x2="' + xs(x) + '" y2="' + ys(Y1) + '" stroke="' +
+      (x === 0 ? '#cbd5e1' : '#f1f5f9') + '"/>';
+    svg += '<text x="' + xs(x) + '" y="' + (H - B + 20) + '" text-anchor="middle" class="tick">' + x + '</text>';
+  }
+  svg += '<line x1="' + xs(X0) + '" y1="' + ys(0) + '" x2="' + xs(X1) + '" y2="' + ys(0) + '" stroke="#94a3b8"/>';
+  svg += '<text x="' + xs(0) + '" y="' + (H - 10) + '" text-anchor="middle" class="axtitle">dial move, points</text>';
+  svg += '<text x="12" y="' + (T + 8) + '" class="axtitle">change in IRR, points</text>';
+
+  const series = DIALS.map(function(dl){
+    const pts = [];
+    for (let x = -3; x <= 3.001; x += 0.25){
+      const m = toModel(BASE_STATE);
+      m[dl.key] = m[dl.key] + x / 100;
+      const o = runModel(m);
+      pts.push([xs(x), ys((o.irr - baseOut.irr) * 100)]);
+    }
+    return {dl: dl, pts: pts};
+  });
+  const order = {c: 0, m: 1, v: 2, p: 3};
+  series.sort(function(a, b){ return order[a.dl.key] - order[b.dl.key]; });
+  for (const s of series){
+    const dash = s.dl.key === 'v' ? ' stroke-dasharray="7 5"' : '';
+    const wdt = s.dl.key === 'v' ? 6 : 2.5;
+    const op = s.dl.key === 'v' ? 0.4 : 0.95;
+    svg += '<polyline fill="none" stroke="' + s.dl.color + '" stroke-width="' + wdt +
+      '" stroke-opacity="' + op + '"' + dash + ' points="' +
+      s.pts.map(function(p){ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ') + '"/>';
+  }
+  for (const d of EXCEL_DOTS){
+    const colorr = d.dial === 'base' ? '#64748b' : BY_KEY[d.dial].color;
+    const ttl = d.dial === 'base' ? 'Excel: base' : 'Excel: ' + BY_KEY[d.dial].label + ' ' +
+      (d.pts > 0 ? '+' : '') + d.pts + 'pt, IRR ' + (d.irr * 100).toFixed(2) + '%';
+    svg += '<circle cx="' + xs(d.pts) + '" cy="' + ys((d.irr - baseOut.irr) * 100) +
+      '" r="4.5" fill="' + colorr + '" stroke="#fff" stroke-width="1.5"><title>' + ttl + '</title></circle>';
+  }
+  const blueY = ys(3.6);
+  svg += '<text x="' + xs(1.15) + '" y="' + blueY + '" class="note" fill="#2563eb">price and volume draw one line</text>';
+  svg += '<text x="' + xs(-2.9) + '" y="' + ys(6.6) + '" class="note" fill="#dc2626">churn mirrors price</text>';
+  el('chart').innerHTML = svg;
+}
+
+el('h-irr').textContent = fPct(baseOut.irr);
+el('h-moic').textContent = baseOut.moic.toFixed(2) + 'x';
+el('h-eb5').textContent = baseOut.ebitda[5].toFixed(2) + 'm';
+answerTable();
+buildChart();
+update();
+</script>
+</body>
+</html>
