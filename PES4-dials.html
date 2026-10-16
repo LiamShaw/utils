@@ -13,9 +13,6 @@ body { margin:0; background:var(--bg); color:var(--ink);
 .wrap { max-width:1020px; margin:0 auto; padding:26px 20px 64px; }
 header h1 { font-size:23px; margin:0 0 4px; }
 .sub { color:var(--muted); margin:0 0 14px; }
-.stats { display:flex; gap:26px; flex-wrap:wrap; margin:12px 0 4px; }
-.stat b { display:block; font-size:20px; line-height:1.2; }
-.stat span { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
 .card { background:var(--card); border:1px solid var(--line); border-radius:12px;
   padding:18px 20px; margin:16px 0; }
 h2 { font-size:16px; margin:0 0 10px; }
@@ -24,6 +21,8 @@ table { border-collapse:collapse; width:100%; font-size:14px; }
 th,td { text-align:right; padding:7px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
 th:first-child,td:first-child { text-align:left; }
 th { color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+#opt-body td { white-space:normal; vertical-align:top; text-align:left; }
+#opt-body td:first-child { min-width:168px; }
 tr:last-child td { border-bottom:none; }
 .pos { color:#047857; } .neg { color:#b91c1c; }
 .chip { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:7px; vertical-align:baseline; }
@@ -37,6 +36,9 @@ input[type=range] { width:100%; }
 .presets button { margin:0 8px 8px 0; padding:6px 12px; border-radius:999px;
   border:1px solid var(--line); background:#fff; cursor:pointer; font:inherit; font-size:13px; color:var(--ink); }
 .presets button:hover { border-color:#94a3b8; }
+.presets button.opt { background:#f8fafc; border-color:#94a3b8; font-weight:600; }
+.optnote { display:none; margin-top:12px; padding:10px 12px; border:1px solid var(--line);
+  border-left:3px solid #2563eb; border-radius:8px; background:#fbfdff; font-size:13px; }
 .tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 @media (max-width:620px) { .tiles { grid-template-columns:repeat(2,1fr); } }
 .tile { border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
@@ -66,12 +68,6 @@ footer { color:var(--muted); font-size:12.5px; margin-top:22px; }
   <h1>Atlas LBO - Session 4 - the four dials, per point</h1>
   <p class="sub">Measured in the "S4 Revenue" tab of the Atlas LBO model. Plan position: price growth 2.0 percent,
   volume growth 3.5 percent, churn 1.5 percent, mix and cross-sell 0.5 percent. Values in EUR millions.</p>
-  <div class="stats">
-    <div class="stat"><b id="h-irr"></b><span>IRR tile</span></div>
-    <div class="stat"><b id="h-moic"></b><span>MOIC</span></div>
-    <div class="stat"><b id="h-eb5"></b><span>year-5 EBITDA</span></div>
-    <div class="stat"><b>2.1pp</b><span>IRR per point</span></div>
-  </div>
 </header>
 
 <section class="card">
@@ -101,9 +97,10 @@ footer { color:var(--muted); font-size:12.5px; margin-top:22px; }
   <div class="grid2">
     <div>
       <p class="small">Drag a dial and watch the tiles, the per-point bars and the EBITDA table respond.
-      The buttons jump straight to the exercise positions.</p>
-      <div class="dialrow"><label>Price growth</label><input type="range" id="s-p" min="0" max="6" step="0.1" value="2"><span class="readout" id="s-p-v"></span></div>
-      <div class="dialrow"><label>Volume growth</label><input type="range" id="s-v" min="0" max="7" step="0.1" value="3.5"><span class="readout" id="s-v-v"></span></div>
+      The buttons load the exercise positions and the three options from the handout; an option setup stays on
+      while you nudge the sliders.</p>
+      <div class="dialrow"><label>Price growth</label><input type="range" id="s-p" min="0" max="8" step="0.1" value="2"><span class="readout" id="s-p-v"></span></div>
+      <div class="dialrow"><label>Volume growth</label><input type="range" id="s-v" min="0" max="9" step="0.1" value="3.5"><span class="readout" id="s-v-v"></span></div>
       <div class="dialrow"><label>Churn</label><input type="range" id="s-c" min="0" max="5" step="0.1" value="1.5"><span class="readout" id="s-c-v"></span></div>
       <div class="dialrow"><label>Mix and cross-sell</label><input type="range" id="s-m" min="0" max="4" step="0.1" value="0.5"><span class="readout" id="s-m-v"></span></div>
       <div class="presets">
@@ -113,6 +110,9 @@ footer { color:var(--muted); font-size:12.5px; margin-top:22px; }
         <button data-preset='{"c":0.5}'>Churn -1pt</button>
         <button data-preset='{"m":1.5}'>Mix +1pt</button>
       </div>
+      <p class="small" style="margin:12px 0 0">The three options from the handout:</p>
+      <div class="presets" id="opt-buttons" style="margin-top:4px"></div>
+      <div class="optnote" id="opt-note"></div>
     </div>
     <div>
       <div class="tiles">
@@ -135,6 +135,17 @@ footer { color:var(--muted); font-size:12.5px; margin-top:22px; }
 </section>
 
 <section class="card">
+  <h2>The three options, as the model hears them</h2>
+  <p class="small" style="margin-bottom:12px">The handout's three options are not dials, so each one needs a
+  translation into the model's vocabulary before it can be priced. These are the translations used here, run
+  through Excel like everything else; the buttons above load them.</p>
+  <table>
+    <thead><tr><th>Option, as set in the model</th><th>The handout promises</th><th>The model answers</th><th>Read</th></tr></thead>
+    <tbody id="opt-body"></tbody>
+  </table>
+</section>
+
+<section class="card">
   <h2>The picture: what one dial at a time does to the IRR</h2>
   <p class="small" style="margin-bottom:12px">Lines are the model, anchored at the plan position.
   Dots are the actual Excel runs: each dial at plus and minus one and two points, plus the base.
@@ -154,8 +165,7 @@ footer { color:var(--muted); font-size:12.5px; margin-top:22px; }
 
 <footer>
   <p>Method: every move was made in a scratch copy of "Atlas_LBO Model_Session 4.xlsx" and recalculated by Excel
-  itself; 35 scenarios were recorded (the base, each dial at plus and minus one and two points, and random
-  combinations). The sliders on this page run the same formulas. They were checked against every Excel run: 735 compared values across 35 scenarios, largest deviation 8.42e-12. Run on 16 October 2026.</p>
+  itself; 49 scenarios were recorded (the base, each dial at plus and minus one and two points, random combinations, and the three option translations using the workbook's one-off shock block). The sliders on this page run the same formulas. They were checked against every Excel run: 1029 compared values across 49 scenarios, largest deviation 1.06e-11. Run on 16 October 2026.</p>
   <p>Base case (the file as shipped): IRR 27.81 percent, MOIC 3.41x, sponsor MOIC 3.02x,
   year-5 EBITDA 19.38m. The original workbook was never modified.</p>
 </footer>
@@ -202,7 +212,11 @@ const PLAN = {
   dpo: 45, // D51/D68
 };
 
-function runModel({ p, v, c, m }) {
+// optional step-change vocabulary (Session 6 block of the workbook):
+//   shock     = D53, revenue shock in the shock year (fraction, e.g. 0.05)
+//   shockYear = D54, which year receives the shock (1..5)
+//   cost      = D55, cost off the fixed block from the shock year on (EURm, negative = cost)
+function runModel({ p, v, c, m, shock = 0, shockYear = 3, cost = 0 }) {
   const A = PLAN;
   const factor = (1 + p) * (1 + v - c) * (1 + m);
   const planFactor = (1 + A.planP) * (1 + A.planV - A.planC) * (1 + A.planM);
@@ -210,7 +224,7 @@ function runModel({ p, v, c, m }) {
   const rev = [A.rev0];
   const planRev = [A.rev0];
   for (let t = 1; t <= A.hold; t++) {
-    rev.push(rev[t - 1] * factor);
+    rev.push(rev[t - 1] * factor * (t === shockYear ? 1 + shock : 1));
     planRev.push(planRev[t - 1] * planFactor);
   }
 
@@ -224,7 +238,8 @@ function runModel({ p, v, c, m }) {
     const planEbitda = A.ebitda0 * Math.pow(1 + A.planEbitdaGrowth, t);
     const cos = 1 - opexPct - sgaPct - (sgaFix + planEbitda) / planRev[t];
     cosPct.push(cos);
-    ebitda.push(rev[t] * (1 - cos - opexPct - sgaPct) - sgaFix);
+    const costLine = t >= shockYear ? cost : 0;
+    ebitda.push(rev[t] * (1 - cos - opexPct - sgaPct) - sgaFix + costLine);
     const rec = rev[t] * A.dso / 365;
     const inv = (rev[t] * cos) / A.invTurn;
     const pay = (rev[t] * cos) * A.dpo / 365;
@@ -262,7 +277,7 @@ function runModel({ p, v, c, m }) {
   const mgmtTakes = exitEquity * A.mgmtShare + promotePay;
   const mgmtMoic = mgmtTakes / A.mgmtIn;
   const sponsorMoic = (exitEquity - mgmtTakes) / (A.equity0 - A.mgmtIn);
-  const lowestCash = Math.min(...cash.slice(1, A.hold + 1));
+  const lowestCash = Math.min.apply(null, cash.slice(1, A.hold + 1));
 
   return {
     rev, planRev, ebitda, cash, debt, netDebt, fcf,
@@ -274,6 +289,7 @@ function runModel({ p, v, c, m }) {
 <script>
 const EXCEL_DOTS = [{"dial":"base","pts":0,"irr":0.27813534195376577},{"dial":"p","pts":1.0,"irr":0.29926726529785874},{"dial":"p","pts":-1.0,"irr":0.2563614807787762},{"dial":"p","pts":2.0,"irr":0.3198303341531519},{"dial":"p","pts":-2.0,"irr":0.2338582540839944},{"dial":"v","pts":1.0,"irr":0.29926726529785874},{"dial":"v","pts":-1.0,"irr":0.2563614807787762},{"dial":"v","pts":2.0,"irr":0.31983033415315143},{"dial":"v","pts":-2.0,"irr":0.23385825408399374},{"dial":"c","pts":1.0,"irr":0.2563614807787762},{"dial":"c","pts":-1.0,"irr":0.29926726529785874},{"dial":"c","pts":2.0,"irr":0.23385825408399374},{"dial":"c","pts":-2.0,"irr":0.3198303341531512},{"dial":"m","pts":1.0,"irr":0.2995781923407952},{"dial":"m","pts":-1.0,"irr":0.2560312116447605},{"dial":"m","pts":2.0,"irr":0.3204360801456989},{"dial":"m","pts":-2.0,"irr":0.23317425843865824}];
 const EX_ROWS = [{"key":"m","label":"Mix and cross-sell","color":"#059669","up":{"dirr":2.144285038702942,"dmoic":0.295890652571964,"deb5":1.441819277887177},"down":{"dirr":-2.2104130309005265,"dmoic":-0.2849247339403407,"deb5":-1.3855613513360794}},{"key":"p","label":"Price growth","color":"#2563eb","up":{"dirr":2.1131923344092973,"dmoic":0.2914583403098314,"deb5":1.4202003846523183},"down":{"dirr":-2.1773861174989584,"dmoic":-0.2808125918711988,"deb5":-1.365585015424216}},{"key":"v","label":"Volume growth","color":"#d97706","up":{"dirr":2.1131923344092973,"dmoic":0.2914583403098314,"deb5":1.4202003846523183},"down":{"dirr":-2.1773861174989584,"dmoic":-0.2808125918711992,"deb5":-1.365585015424216}},{"key":"c","label":"Churn","color":"#dc2626","up":{"dirr":-2.1773861174989584,"dmoic":-0.2808125918711992,"deb5":-1.365585015424216},"down":{"dirr":2.1131923344092973,"dmoic":0.2914583403098314,"deb5":1.4202003846523183}}];
+const OPTIONS = [{"key":"A","btn":"A - Price first","dials":{"p":6.0},"hidden":null,"note":"Loaded: price growth 6.0 percent, four points up. The model reads year 3 as +2.99m of EBITDA and the IRR as 35.95 percent: the claimed 2.5 to 3.5m band pins to exactly four points. Sliders nudge on top of this setup.","setup":"Price growth 6.0 percent, four points up. Nothing else moves.","promise":"EBITDA 2.5 to 3.5m higher by year 3; no new technicians; buyers pay for it; revenue looks slow in years 1 and 2.","answers":"Year 3 +2.99m (35.95 percent IRR, +8.14pp); year 1 +0.83m; MOIC 4.64x (+1.23x).","read":"Holds, and the band pins to four points exactly: three points give +2.22m by year 3, five give +3.77m. Outside this model: the technician headcount (costs live in the flat margin) and the buyer view (the exit multiple is fixed at 10x)."},{"key":"B","btn":"B - Win the national account","dials":{"p":1.0,"v":8.5},"hidden":null,"note":"Loaded: volume growth 8.5 percent, five points up, with one point of price given back to 1.0 percent for the Meridian hold. The model reads year 1 as +0.82m, inside the claimed band, then +2.95m by year 3 and still climbing. Sliders nudge on top of this setup.","setup":"Volume growth 8.5 percent, five points up, with price given back to 1.0 percent for the Meridian cut.","promise":"EBITDA 0.6 to 1.3m higher in year 1, eroding to 0.2m by year 3; buyers discount it.","answers":"Year 1 +0.82m, inside the band; year 3 +2.95m and still climbing; IRR 35.85 percent (+8.04pp).","read":"Half holds. The year-1 number lands in the band, but this model cannot erode a dial: constant growth rates compound upward, so B keeps rising. It cannot price the tender margin or the thirty technicians either; every euro of revenue carries the same margin."},{"key":"C","btn":"C - Buy growth","dials":{},"hidden":{"shock":0.052,"shockYear":1,"cost":-0.4},"note":"Loaded: a 5.2 percent revenue step in year 1 (the workbook's one-off block) plus a 0.4m cost line per year, the closest this model gets to buying growth. Paper EBITDA +1.10m, +0.70m after the cost line. The step and the cost stay on while you nudge the sliders.","setup":"A one-off revenue step in year 1 of 5.2 percent (the shock block), plus 0.4m of cost off the fixed block every year.","promise":"EBITDA +1.1m on paper, +0.7m after integration cost; pro forma leverage about 4.5x; buyers pay only for integrated EBITDA.","answers":"Paper +1.10m, after the cost line +0.70m; IRR 29.51 percent (+1.69pp); MOIC 3.64x (+0.23x).","read":"The numbers reproduce, but a step buys a level where a rate buys compounding: the net +0.70m of year-1 EBITDA becomes +1.69pp of IRR, against +8.14pp for A's four points, which compound to +6.02m by year 5. And the model never pays for the bolt-ons, so C here is an upper bound: no purchase price, no acquisition debt, and the 4.5x leverage test has no home in it."}];
 
 const DIALS = [
   {key:'m', label:'Mix and cross-sell', color:'#059669'},
@@ -286,7 +302,16 @@ DIALS.forEach(function(d){ BY_KEY[d.key] = d; });
 
 const BASE_STATE = {p:2, v:3.5, c:1.5, m:0.5};
 let S = Object.assign({}, BASE_STATE);
-function toModel(s){ return {p:s.p/100, v:s.v/100, c:s.c/100, m:s.m/100}; }
+let HIDDEN = null; // option C's one-off block: {shock, shockYear, cost}
+function toModel(s){
+  const mo = {p:s.p/100, v:s.v/100, c:s.c/100, m:s.m/100};
+  if (HIDDEN){
+    mo.shock = HIDDEN.shock;
+    mo.shockYear = HIDDEN.shockYear;
+    mo.cost = HIDDEN.cost;
+  }
+  return mo;
+}
 const baseOut = runModel(toModel(BASE_STATE));
 
 const el = function(id){ return document.getElementById(id); };
@@ -357,9 +382,33 @@ document.querySelectorAll('[data-preset]').forEach(function(b){
   b.addEventListener('click', function(){
     S = Object.assign({}, BASE_STATE, JSON.parse(b.dataset.preset));
     ['p','v','c','m'].forEach(function(k){ el('s-' + k).value = S[k]; });
+    HIDDEN = null;
+    el('opt-note').style.display = 'none';
     update();
   });
 });
+
+function showOption(o){
+  S = Object.assign({}, BASE_STATE, o.dials);
+  ['p','v','c','m'].forEach(function(k){ el('s-' + k).value = S[k]; });
+  HIDDEN = o.hidden ? Object.assign({}, o.hidden) : null;
+  const note = el('opt-note');
+  note.textContent = o.note;
+  note.style.display = 'block';
+  update();
+}
+const OPT_MAP = {};
+OPTIONS.forEach(function(o){ OPT_MAP[o.key] = o; });
+el('opt-buttons').innerHTML = OPTIONS.map(function(o){
+  return '<button class="opt" data-opt="' + o.key + '">' + o.btn + '</button>';
+}).join('');
+document.querySelectorAll('[data-opt]').forEach(function(b){
+  b.addEventListener('click', function(){ showOption(OPT_MAP[b.dataset.opt]); });
+});
+el('opt-body').innerHTML = OPTIONS.map(function(o){
+  return '<tr><td><b>' + o.btn + '</b><br><span class="small">' + o.setup + '</span></td><td>' +
+    o.promise + '</td><td>' + o.answers + '</td><td>' + o.read + '</td></tr>';
+}).join('');
 
 function answerTable(){
   let rows = '';
@@ -428,9 +477,6 @@ function buildChart(){
   el('chart').innerHTML = svg;
 }
 
-el('h-irr').textContent = fPct(baseOut.irr);
-el('h-moic').textContent = baseOut.moic.toFixed(2) + 'x';
-el('h-eb5').textContent = baseOut.ebitda[5].toFixed(2) + 'm';
 answerTable();
 buildChart();
 update();
